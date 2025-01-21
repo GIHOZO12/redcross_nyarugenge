@@ -1,17 +1,27 @@
-// eslint-disable-next-line no-unused-vars
-import React from 'react'
-import Image from  "../assets/Myimage.jpg"
+import React from 'react';
+import Image from '../assets/Myimage.jpg';
 
 const Header = () => {
   return (
-    <div className='relative'>
-   <img src={Image} alt='image not fopund'/>
-   <div className='absolute top-[500px] left-[18rem] '>
-   <h1 className='text-white text-center'>welcome to RRC Nyarugenge C. Youth s</h1>
-   <p className='text-white text-center'>we are powered family commited and passionate to Humanity activities</p>
-   </div>
-    </div>
-  )
-}
+    <div className="relative">
+      {/* Background Image */}
+      <img
+        src={Image}
+        alt="Background"
+        className="w-full h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] object-cover"
+      />
 
-export default Header
+      {/* Overlay Content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 px-4">
+        <h1 className="text-white text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-4 text-center">
+          Welcome to RRC Nyarugenge C. Youths
+        </h1>
+        <p className="text-white text-sm sm:text-base md:text-lg lg:text-xl text-center max-w-3xl">
+          We are a powered family committed and passionate about humanitarian activities.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
