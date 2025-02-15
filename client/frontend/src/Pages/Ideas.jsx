@@ -1,0 +1,154 @@
+// eslint-disable-next-line no-unused-vars
+import axios from 'axios';
+import { set } from 'date-fns';
+import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+
+
+const Ideas = () => {
+
+
+  const [message, setMessage]=useState({name:'',email:'',description:''})
+
+  const [data, setData]=useState('')
+
+  
+
+  const handleChange=(e)=>{
+    const {name,value}=e.target
+    setMessage({...message,[name]:value})
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const csrfToken = getCookie('csrftoken');
+  
+    if (!csrfToken) {
+      Swal.fire("Error", "CSRF token missing. Please refresh the page.", "error");
+      return;
+    }
+  
+    const data = new FormData();
+    data.append("name", message.name);
+    data.append("email", message.email);
+    data.append("description", message.description);
+  
+    // 🔹 Debugging: Log the form data before sending
+    for (let pair of data.entries()) {
+      console.log(pair[0] + ": " + pair[1]);  // Check key-value pairs
+    }
+  
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/messages_info/", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "X-CSRFToken": csrfToken
+        },
+        withCredentials: true
+      });
+  
+      setMessage({ name: "", email: "", description: "" });
+      setData(response.data.message);
+      Swal.fire("Success", "Idea added successfully", "success");
+    } catch (error) {
+      console.error("Error adding idea", error);
+      setData("Error adding idea");
+      Swal.fire("Error", "Error adding idea", "error");
+    }
+  };
+  
+
+
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }  
+  return (
+    <div className="min-h-screen bg-gray-100 pt-16 flex justify-center items-center">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">Share Your Idea</h1>
+        <p className="text-gray-600 text-center mb-6">We'd love to hear your idea</p>
+            
+        {data && <p className="text-green-600 text-center">{data}</p>}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Name Input */}
+          <div>
+            <label htmlFor="idea" className="block text-gray-700 font-medium mb-1">
+              Your Name
+            </label>
+            <input 
+              type="text" 
+              id="idea" 
+              name="name"
+              required
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your name"
+            />
+          </div>
+          <div>
+            <label htmlFor="idea" className="block text-gray-700 font-medium mb-1">
+              Your Email
+            </label>
+            <input 
+              type="email" 
+              id="idea" 
+              name="email"
+              required
+              onChange={handleChange} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your name"
+            />
+          </div>
+
+          {/* Idea Textarea */}
+          <div>
+            <label htmlFor="idea-description" className="block text-gray-700 font-medium mb-1">
+              Your Idea
+            </label>
+            <textarea 
+              id="idea-description" 
+              name="description" 
+              rows="4"
+              required
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Describe your idea..."
+            ></textarea>
+          </div>
+
+          {/* File Upload */}
+          <div>
+          
+
+
+            
+          </div>
+    
+
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            className="w-full bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-all"
+          >
+            Submit Idea
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Ideas;
