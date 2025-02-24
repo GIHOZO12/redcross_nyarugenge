@@ -24,7 +24,6 @@ from crouirouge.models import (Family, Members, User,
                                RedcrossActivities,
                                FirstAidCourse,Instructors,
                                RedcrossLeader,Messages,SubscribeNewslatter)
-# Create your views here.
 
 from crouirouge.models import Announcement
 
