@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-9hl*trklmh*!_m2xng031_qz)8%a3+!xzw$=3&_^ubm$d3uql!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '172.31.201.93']
+
 
 
 # Application definition
@@ -46,20 +48,26 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt"
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
+AUTHENTICATION_BACKENDS = [
+    'crouirouge.backend.EmailBackend',  # Custom backend
+    'django.contrib.auth.backends.ModelBackend',  # Default
+]
 
 
 
@@ -125,24 +133,27 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:8000",
+    
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 
 ]
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# settings.py
 
-SESSION_COOKIE_NAME = 'sessionid'  
-SESSION_SAVE_EVERY_REQUEST = True 
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = 'Lax'  
-CSRF_COOKIE_SECURE = True  
-SESSION_COOKIE_AGE = 1209600  
-
-
-
+# Session settings
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Use database-backed sessions
+SESSION_COOKIE_NAME = "sessionid"  # Default session cookie name
+# Set session expiration time (24 hours)
+SESSION_COOKIE_AGE = 86400   # 2 weeks in seconds
+SESSION_SAVE_EVERY_REQUEST = True  # Save the session on every request
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to the cookie
+SESSION_COOKIE_SAMESITE = "Lax"  # Prevent cross-site request forgery 
+# Session expiration settings
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session even if browser is closed
+CSRF_COOKIE_SAMESITE = "Lax" 
+CSRF_COOKIE_SECURE = False  
 
 AUTH_PASSWORD_VALIDATORS = [
     {

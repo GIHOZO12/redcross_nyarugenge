@@ -10,7 +10,7 @@ const Viewprofile = () => {
 
   useEffect(() => {
     axios.get("http://127.0.0.1:8000/user_profile/", {
-      withCredentials: true  // Ensure credentials are included for session-based authentication
+      withCredentials: true 
     })
     .then((response) => {
       console.log("Profile Data:", response.data);

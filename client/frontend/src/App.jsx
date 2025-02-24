@@ -121,7 +121,7 @@ const App = () => {
                 <Route path="/Courses" element={<Firstaidcourses />} />
                 <Route path="/families/unit" element={<UnitFamily />} />
                 <Route path="/families/partiarity" element={<Partiality />} />
-                <Route path="/families/humanity_family" element={<Humanity_family />} />
+                <Route path="/families/Humanity" element={<Humanity_family />} />
                 <Route path="/families/neutrality" element={<Neutrality />} />
                 <Route path="/event/fellowership" element={<All_fellowership />} />
                 <Route path="/event/allactivities" element={<All_Activities />} />
