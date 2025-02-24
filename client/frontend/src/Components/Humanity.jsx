@@ -12,7 +12,6 @@ const Humanity = () => {
   axios.get("http://127.0.0.1:8000/latest_redcross_activities/")
   .then((respoaonse) => {
     setActivities(respoaonse.data);
-    console.log(respoaonse.data);
     })
     .catch((error) => {
       console.error('error fetching latest activities',error);
@@ -24,8 +23,8 @@ const Humanity = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-center text-xl sm:text-2xl font-bold pb-6">
-        Humanity and Family Activities
+      <h1 className="text-center text-xl sm:text-2xl font-bold pb-6 ">
+        Humanity and Family Activities 
       </h1>
       <p className="text-gray-600 mt-2 text-center">Explore the newest Redcross activities and events</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

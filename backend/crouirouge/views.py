@@ -1,5 +1,6 @@
 from ast import Subscript
 import json
+import logging
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -8,6 +9,11 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate,login,logout
 from django.middleware.csrf import get_token
 from django.core.files.storage import default_storage
+from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -29,70 +35,80 @@ def anouncement_list(request):
 
 
 
+@csrf_exempt
+def refresh_token(request):
+    if request.method == "POST":
+        refresh_token = request.POST.get("refresh_token")
+        if not refresh_token:
+            return JsonResponse({"status": False, "message": "Refresh token is required"})
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = str(refresh.access_token)
+            return JsonResponse({
+                "status": True,
+                "access_token": access_token,
+            })
+        except Exception as e:
+            return JsonResponse({"status": False, "message": "Invalid refresh token"})
+    return JsonResponse({"status": False, "message": "Invalid request method"})
 
 
 
-
-# views.py
-
-import logging
-
-logger = logging.getLogger(__name__)
-
-import logging
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
-logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def login_info(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        
-        user = authenticate(email=email, password=password)
-        if user:
-            login(request, user)
-            request.session["user_id"] = user.id
-            request.session.save()
-            
+
+        try:
+            user = User.objects.get(email=email)  # Get user by email
+        except User.DoesNotExist:
+            return JsonResponse({"status": False, "message": "Username or password incorrect"})
+
+        if user.check_password(password):  # Check password
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
             return JsonResponse({
                 "status": True,
                 "message": "Login successful",
-                "session_id": request.session.session_key,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
                 "user": {
                     "username": user.username,
                     "is_superuser": user.is_superuser,
                     "is_staff": user.is_staff,
                 },
-                "redirect_url": "/event/allactivities",
+                "redirect_url": "/"
             })
         else:
-            return JsonResponse({"status": False, "message": "Invalid credentials"})
+            return JsonResponse({"status": False, "message": "Username or password incorrect"})
+
     return JsonResponse({"status": False, "message": "Invalid request method"})
+
+
+
 
 
 def user_get_token(request):
     return JsonResponse({"csrfToken": get_token(request)})
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def check_auth(request):
-    if request.user.is_authenticated:
-        return JsonResponse({
-            'is_authenticated': True,
-            'user': {
-                'username': request.user.username,
-                'is_superuser': request.user.is_superuser,
-                'is_staff': request.user.is_staff,
-            }
-        })
-    else:
-        return JsonResponse({
-            'is_authenticated': False,
-            'message': 'User is not authenticated',
-        })
+    return Response({
+        "is_authenticated": True,
+        "user": {
+            "username": request.user.username,
+            "is_superuser": request.user.is_superuser,
+            "is_staff": request.user.is_staff,
+        },
+    })
 
 @csrf_exempt
 def register(request):
@@ -127,6 +143,11 @@ def register(request):
     else:
         return JsonResponse({'status': False, 'message': 'Invalid request method'})
 
+
+def test_cookie(request):
+    response = JsonResponse({"status": True, "message": "Cookie test"})
+    response.set_cookie("test_cookie", "test_value")  # Set a test cookie
+    return response
     
 @csrf_exempt
 def logout_info(request):
@@ -583,6 +604,8 @@ def admin_edit_fellowship(request, id):
 
 def admin_family(request):
     family = Family.objects.all()
+
+
     data = []
     for fam in family:
         data.append({
@@ -803,23 +826,31 @@ def admin_courses(request):
 
 
   
-@login_required
+
 def user_profile(request):
-    print("User:", request.user)  # Debug statement
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "User is not authenticated"}, status=401)
+
+    # Get the user's profile information
     user = request.user
     profile_info = User.objects.filter(username=user.username).first()
-    print("logged user in view",user.username)  
+
+    
+    print("Logged user in view:", user.username)
+
     if not profile_info:
         return JsonResponse({"error": "User not found"}, status=404)
 
-    data = {
-        "id": profile_info.id,
+  
+    return JsonResponse({
         "username": profile_info.username,
         "email": profile_info.email,
-        "profile_image": request.build_absolute_uri(profile_info.profile_image.url) if profile_info.profile_image else None,
-    }
+        "is_superuser": profile_info.is_superuser,
+        "is_staff": profile_info.is_staff,
+    })
 
-    return JsonResponse(data, safe=False)
+ 
 
 
 def redcross_leader(request):
@@ -839,19 +870,25 @@ def redcross_leader(request):
 
 
 
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 def messages_info(request):
     if request.method == "POST":
+        logger.info(f"CSRF Token: {request.META.get('HTTP_X_CSRFTOKEN')}")
+        logger.info(f"POST Data: {request.POST}")
+
         name = request.POST.get("name")
         email = request.POST.get("email")
-        description = request.POST.get("description")  # ✅ Correct key
+        description = request.POST.get("description")
 
         if not name or not email or not description:
             return JsonResponse({"status": False, "message": "All fields are required"}, status=400)
 
-        message_info = Messages(name=name, email=email, description=description)
-        message_info.save()
-        return JsonResponse({"status": True, "message": "Message sent successfully"}, status=201)
+        # Process the data (e.g., save to the database)
+        return JsonResponse({"status": True, "message": "Idea submitted successfully"})
+
+    return JsonResponse({"status": False, "message": "Invalid request method"}, status=405)
     
 def admin_messages(request):
     message=Messages.objects.all().order_by('created_at')
@@ -967,6 +1004,10 @@ def all_messages(request):
     return JsonResponse(message,safe=False)
 
 
+
+def subscribe_letter(request):
+    all_letter=SubscribeNewslatter.objects.all().count()
+    return JsonResponse(all_letter,safe=False)
 
 def subscribe_newsletter(request):
      all_email=SubscribeNewslatter.objects.all()

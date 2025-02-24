@@ -1,14 +1,20 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.middleware.csrf import get_token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
 from django.shortcuts import get_object_or_404
 from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
 from.serial import UserSerializer,FamilySerializer,AnnouncementSerializer,MembersSerializer,Felloweshipserializer,Redcrossactivitiesserializer,FirstAidCourseSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView 
+
+
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
+from .serial import LoginSerializer
 
 @api_view(['GET','POST'])
 def user_list(request):
@@ -163,15 +169,41 @@ def logout_view(request):
         return Response({"success":False},status=500)
     
 
-@csrf_exempt
+@csrf_protect
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def is_auntenticated(request):
     return Response({"success":True})
 
+@csrf_exempt  # Disable CSRF protection for this view
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Allow any user to access this view
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return Response({'csrfToken': csrf_token})
 
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Allow any user to access this view
+def login_view(request):
+    serializer = LoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
+        return Response({
+            "status": True,
+            "message": "Login successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user": {
+                "username": user.username,
+                 "email": user.email,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+            },
+            "redirect_url": "/"
+        }, status=status.HTTP_200_OK)
 
-
-
-
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

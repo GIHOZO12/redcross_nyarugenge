@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
-import { AppContext } from "../AppContext/Appcontext";
+import { AppContext } from "../AppContext/Appcontext"
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
@@ -9,57 +9,53 @@ const Join = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { setuser } = useContext(AppContext);
-  const [csrfToken, setCsrfToken]=useState("")
+  const { setUser } = useContext(AppContext);
+  const [csrfToken, setCsrfToken] = useState("");
 
-  // Function to get CSRF token from cookies
-  
+  // Fetch CSRF token on component mount
   useEffect(() => {
     fetch("http://127.0.0.1:8000/user_get_token/", {
-      credentials: 'include' // Include cookies if needed
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        setCsrfToken(data.csrfToken); // Use the correct key: csrfToken
-        console.log("CSRF Token:", data.csrfToken);
+        setCsrfToken(data.csrfToken);
       })
       .catch((error) => {
-        console.error("Error while getting CSRF token:", error);
+        console.error("Error fetching CSRF token:", error);
       });
   }, []);
-  
-  
+
+  // Handle Login
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Username:", username, "Password:", password);
-  
     try {
-      const response = await fetch("http://127.0.0.1:8000/login_info/", {
+      const response = await fetch("http://127.0.0.1:8000//api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": csrfToken, // Ensure this is correctly set
+          "X-CSRFToken": csrfToken,
         },
         body: new URLSearchParams({
           email: email,
           password: password,
         }),
-        credentials: "include", // Ensures cookies (session) are included
       });
-  
       const data = await response.json();
       if (data.status) {
-        setMessage(data.message);
-        setuser({
+        localStorage.setItem("accessToken", data.access_token);
+        localStorage.setItem("refreshToken", data.refresh_token);
+        setUser({
           is_authenticated: true,
           username: data.user.username,
           is_superuser: data.user.is_superuser,
           is_staff: data.user.is_staff,
         });
-  
         setTimeout(() => {
           window.location.href = data.redirect_url;
-        }, 9000);
+        },500);
+    
+   
       } else {
         setMessage(data.message || "Login failed");
       }
@@ -72,12 +68,12 @@ const Join = () => {
   // Handle Register
   const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch("http://127.0.0.1:8000/register/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
         },
         body: JSON.stringify({
           username: username,
@@ -85,7 +81,6 @@ const Join = () => {
           password: password,
         }),
       });
-
       const data = await response.json();
       if (data.status) {
         setMessage(data.message);
@@ -116,17 +111,16 @@ const Join = () => {
 
               {message && <p className="text-red-500 text-center mb-4">{message}</p>}
 
-              {state === "login" && (
+              {state === "login" ? (
                 <>
                   <div className="flex items-center p-4 border rounded-md mb-4">
                     <FaEnvelope className="mr-2 text-gray-500 text-xl" />
                     <input
                       type="email"
-                      placeholder="email"
+                      placeholder="Email"
                       className="flex-1 outline-none"
                       onChange={(e) => setEmail(e.target.value)}
                       required
-
                     />
                   </div>
                   <div className="flex items-center p-4 border rounded-md mb-4">
@@ -134,7 +128,6 @@ const Join = () => {
                     <input
                       type="password"
                       placeholder="Password"
-                      name="password"
                       className="flex-1 outline-none"
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -147,6 +140,7 @@ const Join = () => {
                       className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
                     />
                   </div>
+                  <a href="" className="text-center text-blue-600 p-2">Forgot password</a>
                   <p className="mt-4 text-sm text-center">
                     New to the app?{" "}
                     <a
@@ -158,63 +152,58 @@ const Join = () => {
                     </a>
                   </p>
                 </>
-              )}
-
-              {state === "register" && (
+              ) : (
                 <>
-                  <div>
-                    <div className="flex items-center p-4 border rounded-md mb-4">
-                      <FaUser className="mr-2 text-gray-500 text-3xl" />
-                      <input
-                        type="text"
-                        placeholder="Username"
-                        className="flex-1 outline-none"
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex items-center p-4 border rounded-md mb-4">
-                      <FaEnvelope className="mr-2 text-gray-500 text-xl" />
-                      <input
-                        type="email"
-                        placeholder="Email"
-                        className="flex-1 outline-none"
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex items-center p-4 border rounded-md mb-4">
-                      <FaLock className="mr-2 text-gray-500 text-xl" />
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        className="flex-1 outline-none"
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="submit"
-                        value="Register"
-                        className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
-                      />
-                    </div>
-                    <p className="mt-4 text-sm text-center">
-                      I already have an account?{" "}
-                      <a
-                        href="#"
-                        className="text-blue-600 hover:underline"
-                        onClick={() => setState("login")}
-                      >
-                        Login
-                      </a>
-                    </p>
+                  <div className="flex items-center p-4 border rounded-md mb-4">
+                    <FaUser className="mr-2 text-gray-500 text-3xl" />
+                    <input
+                      type="text"
+                      placeholder="Username"
+                      className="flex-1 outline-none"
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                    />
                   </div>
+                  <div className="flex items-center p-4 border rounded-md mb-4">
+                    <FaEnvelope className="mr-2 text-gray-500 text-xl" />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      className="flex-1 outline-none"
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="flex items-center p-4 border rounded-md mb-4">
+                    <FaLock className="mr-2 text-gray-500 text-xl" />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      className="flex-1 outline-none"
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="submit"
+                      value="Register"
+                      className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
+                    />
+                  </div>
+                  <p className="mt-4 text-sm text-center">
+                    I already have an account?{" "}
+                    <a
+                      href="#"
+                      className="text-blue-600 hover:underline"
+                      onClick={() => setState("login")}
+                    >
+                      Login
+                    </a>
+                  </p>
                 </>
               )}
 
-              {/* Close Button */}
               <FaTimes
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer text-lg"
                 onClick={() => setShowLogin(false)}

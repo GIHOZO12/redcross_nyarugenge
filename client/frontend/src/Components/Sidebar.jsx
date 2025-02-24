@@ -12,11 +12,21 @@ import {  FaUserFriends  } from "react-icons/fa";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [allmessage,setAllMessage]=useState()
+  const [newlatter,setNewltter]=useState()
 
   useEffect(()=>{
     axios.get("http://127.0.0.1:8000/all_messages/")
     .then((response)=>{
       setAllMessage(response.data)
+    }).catch((error)=>{
+      console.error("error fetching data",error)
+    })
+  })
+
+  useEffect(()=>{
+    axios.get("http://127.0.0.1:8000/all_letter/")
+    .then((res)=>{
+   setNewltter(res.data)
     }).catch((error)=>{
       console.error("error fetching data",error)
     })
@@ -46,9 +56,9 @@ const Sidebar = () => {
 </li>
 
 
-            <li>
+            {/* <li>
               <Link to="/admin/Redscrossactivies" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>Activities</Link>
-            </li>
+            </li> */}
             <li>
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
@@ -63,7 +73,7 @@ const Sidebar = () => {
             </li>
 
             <li>
-              <Link to="/subscibe_newslatter" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>All Subscription</Link>
+              <Link to="/subscibe_newslatter" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>All Subscription<span className="ml-2 bg-red-500 text-white rounded-full py-2 px-2 text-xs font-bold">{newlatter}</span></Link>
             </li>
             <li>
               <Link to="/" className="block p-3 rounded hover:bg-blue-700">Go to Site</Link>
@@ -101,9 +111,9 @@ const Sidebar = () => {
             <li onClick={() => setIsOpen(false)}>
               <Link to="/admin/adminusers" className="block p-3 rounded hover:bg-blue-700">Users</Link>
             </li>
-            <li onClick={() => setIsOpen(false)}>
+            {/* <li onClick={() => setIsOpen(false)}>
               <Link to="/admin/Redscrossactivies" className="block p-3 rounded hover:bg-blue-700">Activities</Link>
-            </li>
+            </li> */}
             <li onClick={() => setIsOpen(false)}>
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
@@ -118,7 +128,7 @@ const Sidebar = () => {
             </li>
 
             <li>
-              <Link to="/subscibe_newslatter"  onClick={()=>setIsOpen(false)} className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>All Subscription</Link>
+              <Link to="/subscibe_newslatter"  onClick={()=>setIsOpen(false)} className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>All Subscription<span className="ml-2 bg-red-500 text-white rounded-full py-1 text-xl font-bold">{newlatter}</span></Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
               <Link to="/" className="block p-3 rounded hover:bg-blue-700">Go to Site</Link>

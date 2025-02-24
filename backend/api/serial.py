@@ -1,4 +1,6 @@
 from rest_framework import serializers
+# from backend.api import authentication
+from django.contrib.auth import authenticate
 from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,4 +39,22 @@ class FirstAidCourseSerializer(serializers.ModelSerializer):
      class Meta:
           model=FirstAidCourse
           fields=["id","title","description","first_id_video"]
-          extra_kwargs={"id":{"read_only":True,"required":False}}           
+          extra_kwargs={"id":{"read_only":True,"required":False}}  
+
+
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        user = authenticate(email=email, password=password)
+        if user is None:
+            raise serializers.ValidationError('Invalid email or password')
+
+        attrs['user'] = user
+        return attrs                   

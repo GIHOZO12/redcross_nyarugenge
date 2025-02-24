@@ -1,10 +1,12 @@
 from django.urls import path
-from .views import (user_list,family_list,announcement_list,
+from .views import (login_view, get_csrf_token, user_list,family_list,announcement_list,
                     members_list,felloweship_list,redcrossactivities_list
                     ,first_id_course_list,CustomTokenObtainPairView,CustomRefreshToken,logout_view,is_auntenticated)
 
 urlpatterns = [
     path('users/', user_list, name='user_list'),
+    path('login/', login_view, name='login'),
+    path('csrf/', get_csrf_token, name='get_csrf_token'),
     path('families/', family_list, name='family_list'),
      path('families/<int:name>/', family_list, name='family_detail'),
     path("members/",members_list,name="member"),

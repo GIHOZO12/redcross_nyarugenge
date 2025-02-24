@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import axios from 'axios';
 import { set } from 'date-fns';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Swal from 'sweetalert2';
 
 
@@ -11,6 +11,23 @@ const Ideas = () => {
   const [message, setMessage]=useState({name:'',email:'',description:''})
 
   const [data, setData]=useState('')
+
+
+  const [csrfToken, setCsrfToken] = useState("");
+  
+    // Fetch CSRF token on component mount
+    useEffect(() => {
+      fetch("http://127.0.0.1:8000/user_get_token/", {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setCsrfToken(data.csrfToken);
+        })
+        .catch((error) => {
+          console.error("Error fetching CSRF token:", error);
+        });
+    }, []);
 
   
 
@@ -22,7 +39,7 @@ const Ideas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const csrfToken = getCookie('csrftoken');
+  
   
     if (!csrfToken) {
       Swal.fire("Error", "CSRF token missing. Please refresh the page.", "error");
@@ -58,23 +75,9 @@ const Ideas = () => {
     }
   };
   
+  
 
-
-
-      function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-          const cookies = document.cookie.split(';');
-          for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-            }
-          }
-        }
-        return cookieValue;
-      }  
+  
   return (
     <div className="min-h-screen bg-gray-100 pt-16 flex justify-center items-center">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg">

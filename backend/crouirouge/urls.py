@@ -5,8 +5,11 @@ from . import views
 urlpatterns = [
     path('anounce',views.anouncement_list,name='announcement'),
     path('login_info/',views.login_info,name='login_info'),
+    path('refresh_token/', views.refresh_token, name='refresh_token'),
     path('check_auth/',views.check_auth,name='check_auth'),
     path('register/',views.register,name='register'),
+    path('test_cookie/', views.test_cookie, name='test_cookie'),
+    path("all_letter/",views.subscribe_letter,name="newslatter"),
     path('logout/',views.logout_info,name='logout'),
     path("user_get_token/",views.user_get_token,name="user_get_token"),
     path("user_profile/", views.user_profile, name="user_profile"),

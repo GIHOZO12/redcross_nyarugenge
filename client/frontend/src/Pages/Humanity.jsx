@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../AppContext/Appcontext";
 import Swal from "sweetalert2";
+import { formatDistanceToNow } from "date-fns";
 
 const Humanity_family = () => {
   const [familyData, setFamilyData] = useState(null);
@@ -22,7 +23,7 @@ const Humanity_family = () => {
 
         
         const activitiesResponse = await axios.get(
-          "http://127.0.0.1:8000/family_activities/	Humanity/"
+          "http://127.0.0.1:8000/family_activities/Humanity/"
         );
         setActivities(activitiesResponse.data.activities);
       } catch (error) {
@@ -152,11 +153,11 @@ const Humanity_family = () => {
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-semibold text-gray-800">
-                   <span className="text-black font-bold">Title: </span> {activity.title}
+                   {activity.title}
                   </h3>
-                  <p className="text-gray-600 mt-2"> <span className="text-black font-bold">descriprion: </span>{activity.text}</p>
+                  <p className="text-gray-600 mt-2"> {activity.text}</p>
                   <p className="text-sm text-gray-400 mt-4">
-                  <span className="text-black font-bold">Date of activity: </span>  {new Date(activity.created).toLocaleString()}
+                   {new Date(activity.created).toLocaleString()}
                   </p>
                     {isFamilyParent && (
                   <div className="flex justify-end p-2  gap-3">

@@ -18,12 +18,40 @@ const Navbar = () => {
   
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { setshowlogin, user = {}, setuser } = useContext(AppContext);
+  const { setshowlogin, user = {}, setUser } = useContext(AppContext);
   const  {setshowpayment}=useContext(AppContext);
  
 
 
  
+
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("cd", {
+        method: "POST",
+        credentials: "include", // Include cookies for session-based auth
+      });
+      const data = await response.json();
+      if (data.status) {
+        // Clear frontend authentication state
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        setUser({
+          is_authenticated: false,
+          username: "",
+          is_superuser: false,
+          is_staff: false,
+        });
+        navigate("/"); // Redirect to homepage
+      } else {
+        console.error("Logout failed:", data.message);
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
 
   
@@ -131,7 +159,7 @@ const Navbar = () => {
                   variants={dropdownVariants}
                   className="absolute left-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-50"
                 >
-                  <Link to="/families/humanity_family" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/families/Humanity" onClick={() => setIsMobileMenuOpen(false)}>
                     <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
                       Humanity Family
                     </li>
@@ -259,29 +287,7 @@ const Navbar = () => {
                 </Link>
                 <li
   className="py-2 px-4 cursor-pointer hover:text-red-400"
-  onClick={async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/logout/", {
-        method: "POST",
-        credentials: "include", // Include cookies
-      });
-      const data = await response.json();
-      if (data.status) {
-        console.log("Logged out successfully");
-        setuser({
-          is_authenticated: false,
-          username: "",
-          is_superuser: false,
-          is_staff: false,
-        });
-        navigate("/");
-      } else {
-        console.error("Logout failed:", data.message);
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  }}
+  onClick={handleLogout}
 >
   Logout
 </li>

@@ -18,7 +18,7 @@ const Payment = () => {
         <p className='text-center mb-6'>Please select a Donate method</p>
         <div className='flex flex-col gap-3'>
             <div>
-       <Link to="https://www.paypal.com/donate/?hosted_button_id=YP2PNJJ9SGTYE">  <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full'>Donate with PayPal</button>
+       <Link to="https://www.paypal.com/donate/?hosted_button_id=YP2PNJJ9SGTYE">  <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full'>Donate with card</button>
        </Link> 
        </div>
        <div className='flex bg-gray-500 hover:bg-gray-700 rounded-full'>
