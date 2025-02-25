@@ -14,7 +14,7 @@ const Join = () => {
 
   // Fetch CSRF token on component mount
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/user_get_token/", {
+    fetch("https://gihozo.pythonanywhere.com/user_get_token/", {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -30,7 +30,7 @@ const Join = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000//api/login/", {
+      const response = await fetch("https://gihozo.pythonanywhere.com/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -69,7 +69,7 @@ const Join = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000/register/", {
+      const response = await fetch("https://gihozo.pythonanywhere.com/register/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
