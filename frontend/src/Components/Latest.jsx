@@ -8,7 +8,7 @@ const Latest = () => {
   const [latest, setLatest] = React.useState([]);
 
   React.useEffect(() => {
-    axios.get(https://gihozo.pythonanywhere.com/latest_fellowership/')
+    axios.get("https://gihozo.pythonanywhere.com/latest_fellowership/")
       .then(response => {
         // console.log("Fetched data:", response.data);  // Debugging
         setLatest(response.data);
