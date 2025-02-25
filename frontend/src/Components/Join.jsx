@@ -53,7 +53,7 @@ const Join = () => {
         });
         setTimeout(() => {
           window.location.href = data.redirect_url;
-        },500);
+        },9000);
     
    
       } else {
