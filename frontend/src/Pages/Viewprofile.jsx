@@ -9,7 +9,7 @@ const Viewprofile = () => {
   const [Profile,setProfile]=useState([])
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/current_user/", {
+    axios.get("https://gihozo.pythonanywhere.com//api/current_user/", {
       withCredentials: true 
     })
     .then((response) => {
