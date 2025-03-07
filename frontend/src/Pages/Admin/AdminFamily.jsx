@@ -6,7 +6,7 @@ import AdminLayout from '../../Layout/AdminLayout'
 const AdminFamily = () => {
     const [family, setFamily] = useState([])
     useEffect(()=>{
-        axios.get("http://127.0.0.1:8000/admin_family/")
+        axios.get("https://gihozo.pythonanywhere.com/admin_family/")
         .then((response)=>{
             setFamily(response.data)
         }).catch((error)=>{
