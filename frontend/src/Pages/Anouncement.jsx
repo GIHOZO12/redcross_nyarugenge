@@ -7,7 +7,7 @@ const  Announcements=()=> {
     const [searchQuery,setSearchQuery]=useState("");
     useEffect(()=>{
       axios
-      .get("http://127.0.0.1:8000/announcement_list/")
+      .get("https://gihozo.pythonanywhere.com//announcement_list/")
       .then((response)=>{
         setDetails(response.data)
       }).catch((error)=>{
