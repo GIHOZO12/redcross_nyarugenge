@@ -8,7 +8,7 @@ const AddFellowship = () => {
     const [csrfToken, setCsrfToken] = useState('');
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/get_csrf_token/", { withCredentials: true })
+        axios.get("https://gihozo.pythonanywhere.com/get_csrf_token/", { withCredentials: true })
             .then(response => {
                 setCsrfToken(response.data.csrfToken);
                 console.log("CSRF Token received:", response.data.csrfToken);
@@ -33,7 +33,7 @@ const AddFellowship = () => {
         data.append('fellowership_image', formData.fellowership_image);
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/add_fellowship/", data, {
+            const response = await axios.post("https://gihozo.pythonanywhere.com/add_fellowship/", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "X-CSRFToken": csrfToken,
