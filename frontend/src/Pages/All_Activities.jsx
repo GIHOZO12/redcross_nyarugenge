@@ -7,7 +7,7 @@ const All_Activities = () => {
   const [searchQuery,setSearchQuery]=useState("");
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/All_activities/')
+    axios.get('https://gihozo.pythonanywhere.com/All_activities/')
       .then((response) => {
         setAllactivities(response.data);
       })
