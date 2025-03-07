@@ -12,7 +12,7 @@ const Leader = () => {
   const [leader, setLeader] = useState([]);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/leaders")
+    axios.get("https://gihozo.pythonanywhere.com/leaders")
       .then((response) => {
         setLeader(response.data);
       })
