@@ -9,7 +9,7 @@ const Humanity = () => {
  const [activities,setActivities]=useState([]);
 
  useEffect(() => {
-  axios.get("http://127.0.0.1:8000/latest_redcross_activities/")
+  axios.get("https://gihozo.pythonanywhere.com/latest_redcross_activities/")
   .then((respoaonse) => {
     setActivities(respoaonse.data);
     })
