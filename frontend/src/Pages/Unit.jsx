@@ -16,10 +16,10 @@ const UnitFamily = () => {
   useEffect(() => {
     const fetchFamilyData = async () => {
       try {
-        const familyResponse = await axios.get("http://127.0.0.1:8000/family_list/unit/");
+        const familyResponse = await axios.get("https://gihozo.pythonanywhere.com/family_list/unit/");
         setFamilyData(familyResponse.data.family);
 
-        const membersResponse = await axios.get("http://127.0.0.1:8000/family_members/unit/");
+        const membersResponse = await axios.get("https://gihozo.pythonanywhere.com/family_members/unit/");
         setMembers(membersResponse.data.members);
 
         const activitiesResponse = await axios.get("http://127.0.0.1:8000/family_activities/unit/");
