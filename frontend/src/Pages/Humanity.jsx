@@ -17,13 +17,13 @@ const Humanity_family = () => {
       try {
        
         const familyResponse = await axios.get(
-          "http://127.0.0.1:8000/family_list/Humanity/"
+          "https://gihozo.pythonanywhere.com//family_list/Humanity/"
         );
         setFamilyData(familyResponse.data.family);
 
         
         const activitiesResponse = await axios.get(
-          "http://127.0.0.1:8000/family_activities/Humanity/"
+          "https://gihozo.pythonanywhere.com//family_activities/Humanity/"
         );
         setActivities(activitiesResponse.data.activities);
       } catch (error) {
@@ -71,7 +71,7 @@ const Humanity_family = () => {
     if(result.isConfirmed){
 
     try {
-      const response = await axios.delete(`http://127.0.0.1:8000/family_delete_activity/${id}/`, {
+      const response = await axios.delete(`https://gihozo.pythonanywhere.com//family_delete_activity/${id}/`, {
         headers: {
           "X-CSRFToken": csrfToken,
         },
