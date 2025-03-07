@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
-    "rest_framework_simplejwt"
+ 'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -113,6 +113,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
          'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication'
+        
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -139,8 +140,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 
 ]
-# settings.py
-
+CORS_ORIGIN_ALLOW_ALL = True 
 # Session settings
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Use database-backed sessions
 SESSION_COOKIE_NAME = "sessionid"  # Default session cookie name
@@ -150,10 +150,12 @@ SESSION_SAVE_EVERY_REQUEST = True  # Save the session on every request
 SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to the cookie
 SESSION_COOKIE_SAMESITE = "Lax"  # Prevent cross-site request forgery 
-# Session expiration settings
+CSRF_COOKIE_NAME = 'csrftoken'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session even if browser is closed
 CSRF_COOKIE_SAMESITE = "Lax" 
 CSRF_COOKIE_SECURE = False  
+CSRF_COOKIE_HTTPONLY = False  # Ensure this is set to False to allow JavaScript access
+CSRF_COOKIE_SAMESITE = 'Lax'   # Use 'None' if cross-domain
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -188,6 +190,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -197,3 +205,9 @@ AUTH_USER_MODEL = 'crouirouge.User'
 
 
 
+# import logging
+# import sys
+
+# logging.getLogger("django.server").addFilter(
+#     lambda record: "Broken pipe" not in record.getMessage()
+# )

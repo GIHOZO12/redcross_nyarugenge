@@ -19,8 +19,6 @@ from django.urls import path,include,re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
-
-
 admin.site.site_header="RRC Nyarugenge C. Youth s"
 admin.site.index_title="RRC Nyarugenge C. Youth s"
 
@@ -28,8 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include('api.urls')),
     path("",include("crouirouge.urls")),
+    path('api-auth/',include('rest_framework.urls')),
 ]
 if settings.DEBUG:
    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns +=[re_path(r'^.*', TemplateView.as_view(template_name='index.html'))]
+# urlpatterns +=[re_path(r'^.*', TemplateView.as_view(template_name='index.html'))]
