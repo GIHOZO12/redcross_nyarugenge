@@ -29,7 +29,7 @@ const Edit_activities = () => {
     });
     const [message, setMessage] = useState("");
     useEffect(() => {
-        axios.get(`http://127.0.0.1:8000/edit_activity/${id}`, {
+        axios.get(`https://gihozo.pythonanywhere.com/edit_activity/${id}`, {
             withCredentials: true  
         })
         .then((res) => {
@@ -54,7 +54,7 @@ const Edit_activities = () => {
 
         
         axios.post(
-            `http://127.0.0.1:8000/edit_activity/${id}`,
+            `https://gihozo.pythonanywhere.com/edit_activity/${id}`,
             data,
             {
                 headers: {
