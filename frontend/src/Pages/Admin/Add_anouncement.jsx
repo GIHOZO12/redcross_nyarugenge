@@ -19,7 +19,7 @@ const Add_anouncement = () => {
     data.append('text', announcement.text);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/admin_add_announcement/", data, {
+      const response = await axios.post("https://gihozo.pythonanywhere.com/admin_add_announcement/", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           "X-CSRFToken": getCookie("csrftoken"),  // ✅ Ensure CSRF token is sent
