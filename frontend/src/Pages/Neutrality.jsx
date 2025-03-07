@@ -16,13 +16,13 @@ const UnitFamily = () => {
       try {
        
         const familyResponse = await axios.get(
-          "http://127.0.0.1:8000/family_list/	neutrality/"
+          "https://gihozo.pythonanywhere.com/family_list/	neutrality/"
         );
         setFamilyData(familyResponse.data.family);
 
         
         const activitiesResponse = await axios.get(
-          "http://127.0.0.1:8000/family_activities/	neutrality/"
+          "https://gihozo.pythonanywhere.com/family_activities/	neutrality/"
         );
         setActivities(activitiesResponse.data.activities);
       } catch (error) {
@@ -71,7 +71,7 @@ const UnitFamily = () => {
     if(result.isConfirmed){
 
     try {
-      const response = await axios.delete(`http://127.0.0.1:8000/family_delete_activity/${id}/`, {
+      const response = await axios.delete(`https://gihozo.pythonanywhere.com/family_delete_activity/${id}/`, {
         headers: {
           "X-CSRFToken": csrfToken,
         },
