@@ -74,7 +74,7 @@ const AdminMessage = () => {
         <div className="flex flex-wrap gap-2 md:gap-4 mb-4 bg-white p-3 md:p-4 shadow-md rounded-md">
           <button
             className="bg-blue-500 text-white px-3 md:px-4 py-2 rounded hover:bg-blue-700"
-            onClick={() => fetchMessages("http://127.0.0.1:8000/get_all_messages/")}
+            onClick={() => fetchMessages("https://gihozo.pythonanywhere.com/get_all_messages/")}
           >
             All Messages
           </button>
@@ -88,7 +88,7 @@ const AdminMessage = () => {
           </button>
 
           <button
-            onClick={() => fetchMessages("http://127.0.0.1:8000/get_archived_messages/")}
+            onClick={() => fetchMessages("https://gihozo.pythonanywhere.com/get_archived_messages/")}
             className="bg-purple-500 text-white px-3 md:px-4 py-2 rounded hover:bg-purple-700"
           >
             View Archive
