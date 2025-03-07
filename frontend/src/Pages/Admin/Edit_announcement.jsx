@@ -11,9 +11,9 @@ const Edit_announcement = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("📢 Fetching:", `http://127.0.0.1:8000/edit_announcement/${id}/`);
+    console.log("📢 Fetching:", `https://gihozo.pythonanywhere.com/edit_announcement/${id}/`);
     
-    axios.get(`http://127.0.0.1:8000/edit_announcement/${id}/`, { withCredentials: true }) // ✅ Remove extra slash
+    axios.get(`https://gihozo.pythonanywhere.com/edit_announcement/${id}/`, { withCredentials: true }) // ✅ Remove extra slash
       .then((res) => {
         console.log("✅ Data received:", res.data);
         setAnnouncement(res.data);
@@ -30,7 +30,7 @@ const Edit_announcement = () => {
     formdata.append('description', announcement.text); // Use text field for description
 
     // Send POST request to update the announcement
-    axios.post(`http://127.0.0.1:8000/edit_announcement/${id}/`, formdata, {
+    axios.post(`https://gihozo.pythonanywhere.com/edit_announcement/${id}/`, formdata, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true
       })
