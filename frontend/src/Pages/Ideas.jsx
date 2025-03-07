@@ -17,7 +17,7 @@ const Ideas = () => {
   
     // Fetch CSRF token on component mount
     useEffect(() => {
-      fetch("http://127.0.0.1:8000/user_get_token/", {
+      fetch("https://gihozo.pythonanywhere.com/user_get_token/", {
         credentials: "include",
       })
         .then((res) => res.json())
@@ -57,7 +57,7 @@ const Ideas = () => {
     }
   
     try {
-      const response = await axios.post("http://127.0.0.1:8000/messages_info/", data, {
+      const response = await axios.post("https://gihozo.pythonanywhere.com/messages_info/", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           "X-CSRFToken": csrfToken
