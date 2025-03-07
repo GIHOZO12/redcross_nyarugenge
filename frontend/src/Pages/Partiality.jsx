@@ -17,13 +17,13 @@ const Partiality = () => {
       try {
        
         const familyResponse = await axios.get(
-          "http://127.0.0.1:8000/family_list/partiarity/"
+          "https://gihozo.pythonanywhere.com/family_list/partiarity/"
         );
         setFamilyData(familyResponse.data.family);
 
         
         const activitiesResponse = await axios.get(
-          "http://127.0.0.1:8000/family_activities/	partiarity/"
+          "https://gihozo.pythonanywhere.com/family_activities/	partiarity/"
         );
         setActivities(activitiesResponse.data.activities);
       } catch (error) {
@@ -72,7 +72,7 @@ const Partiality = () => {
 
 
     try {
-      const response = await axios.delete(`http://127.0.0.1:8000/family_delete_activity/${id}/`, {
+      const response = await axios.delete(`https://gihozo.pythonanywhere.com/family_delete_activity/${id}/`, {
         headers: {
           "X-CSRFToken": csrfToken,
         },
