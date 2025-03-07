@@ -8,7 +8,7 @@ const FirstAidDetails = () => {
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:8000/first-aid_course/${id}/`) // ✅ Fixed API URL
+      .get(`https://gihozo.pythonanywhere.com/first-aid_course/${id}/`) // ✅ Fixed API URL
       .then((response) => {
         setCourseDetails(response.data);
       })
