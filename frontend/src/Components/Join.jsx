@@ -14,7 +14,7 @@ const Join = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+      const response = await axios.post("https://gihozo.pythonanywhere.com/api/login/", {
         email,
         password,
       });
@@ -58,7 +58,7 @@ const Join = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/register/",
+        "https://gihozo.pythonanywhere.com//api/register/",
         {
           username,
           email,
