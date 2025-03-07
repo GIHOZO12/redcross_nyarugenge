@@ -10,7 +10,7 @@ const AdminFellowership = () => {
     const [fellowership, setFellowership] = useState([]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/admin_fellowships/")
+        axios.get("https://gihozo.pythonanywhere.com/admin_fellowships/")
             .then((response) => {
                 setFellowership(response.data);
             })
