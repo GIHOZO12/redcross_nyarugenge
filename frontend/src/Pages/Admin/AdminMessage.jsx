@@ -11,7 +11,7 @@ const AdminMessage = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/admin_messages/")
+      .get("https://gihozo.pythonanywhere.com/admin_messages/")
       .then((res) => setAdminMessages(res.data))
       .catch((error) => console.error("Error fetching data", error));
   }, []);
@@ -37,7 +37,7 @@ const AdminMessage = () => {
 
     axios
       .post(
-        "http://127.0.0.1:8000/update_message_status/",
+        "https://gihozo.pythonanywhere.com/update_message_status/",
         { ids: selectedMessages, action },
         { headers: { "X-CSRFToken": getCookie("csrftoken"), "Content-Type": "application/json" } }
       )
