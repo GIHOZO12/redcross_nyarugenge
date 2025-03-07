@@ -8,7 +8,7 @@ const Admin_courses = () => {
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/admin_courses/")
+        axios.get("https://gihozo.pythonanywhere.com/admin_courses/")
             .then((response) => {
                 setCourses(response.data);
             })
