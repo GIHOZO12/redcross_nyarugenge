@@ -15,7 +15,7 @@ const Sidebar = () => {
   const [newlatter,setNewltter]=useState()
 
   useEffect(()=>{
-    axios.get("http://127.0.0.1:8000/all_messages/")
+    axios.get("https://gihozo.pythonanywhere.com/all_messages/")
     .then((response)=>{
       setAllMessage(response.data)
     }).catch((error)=>{
@@ -24,7 +24,7 @@ const Sidebar = () => {
   })
 
   useEffect(()=>{
-    axios.get("http://127.0.0.1:8000/all_letter/")
+    axios.get("https://gihozo.pythonanywhere.com/all_letter/")
     .then((res)=>{
    setNewltter(res.data)
     }).catch((error)=>{
