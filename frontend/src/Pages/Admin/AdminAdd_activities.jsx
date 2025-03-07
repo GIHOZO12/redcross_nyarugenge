@@ -27,7 +27,7 @@ const AddActivity = () => {
       const csrfToken = getCookie("csrftoken");
       console.log("CSRF token:", csrfToken);
   
-      const response = await axios.post("http://127.0.0.1:8000/admin/addactivities/", data, {
+      const response = await axios.post("https://gihozo.pythonanywhere.com/admin/addactivities/", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           "X-CSRFToken": csrfToken,
