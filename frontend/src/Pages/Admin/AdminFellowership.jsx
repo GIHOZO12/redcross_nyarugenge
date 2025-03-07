@@ -36,7 +36,7 @@ const AdminFellowership = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://127.0.0.1:8000/admin_deleter_fellowship/${id}/`)
+                axios.delete(`https://gihozo.pythonanywhere.com/admin_deleter_fellowship/${id}/`)
                     .then((response) => {
                         if (response.data.status) {
                             setFellowership(fellowership.filter(item => item.id !== id));
