@@ -14,7 +14,7 @@ const Update_activity = () => {
     const [message, setMessage] = useState("");
 
     useEffect(() => {
-        axios.get(`http://127.0.0.1:8000/update_activity/${id}/`)
+        axios.get(`https://gihozo.pythonanywhere.com/update_activity/${id}/`)
             .then((res) => {
                 console.log(res.data);
                 // Map backend keys to frontend keys
@@ -37,7 +37,7 @@ const Update_activity = () => {
         formdata.append("text", activity.text);
         formdata.append("activity_image", activity.activity_image);
 
-        axios.post(`http://127.0.0.1:8000/update_activity/${id}/`, formdata, {
+        axios.post(`https://gihozo.pythonanywhere.com/update_activity/${id}/`, formdata, {
             withCredentials: true,
             headers: {
                 "Content-Type": "multipart/form-data",
