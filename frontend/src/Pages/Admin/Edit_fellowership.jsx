@@ -11,9 +11,9 @@ const EditFellowership = () => {
   const [message, setMessage] = useState(""); // ✅ Add a success message state
 
   useEffect(() => {
-    console.log("📢 Fetching:", `http://127.0.0.1:8000/admin_edit_fellowship/${id}/`);
+    console.log("📢 Fetching:", `https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`);
     
-    axios.get(`http://127.0.0.1:8000/admin_edit_fellowship/${id}/`)
+    axios.get(`https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`)
       .then((res) => {
         console.log("✅ Data received:", res.data);
         setFellowership(res.data);
@@ -37,10 +37,10 @@ const EditFellowership = () => {
       formData.append("fellowership_image", fellowership.image);
     }
   
-    console.log("📤 Sending update to:", `http://127.0.0.1:8000/admin_edit_fellowship/${id}/`);
+    console.log("📤 Sending update to:", `https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`);
     console.log("📦 Payload:", [...formData.entries()]);
   
-    axios.post(`http://127.0.0.1:8000/admin_edit_fellowship/${id}/`, formData, {
+    axios.post(`https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     })
     .then((res) => {
