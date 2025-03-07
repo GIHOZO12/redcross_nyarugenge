@@ -6,7 +6,7 @@ const Adminuser = () => {
   const [users, setUsers] = React.useState([]);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/users_info/")
+    axios.get("https://gihozo.pythonanywhere.com/users_info/")
       .then((response) => {
         console.log(response.data);
         setUsers(response.data);
