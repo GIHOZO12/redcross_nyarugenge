@@ -36,7 +36,7 @@ const Add_activities = () => {
   
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/create_activity/",
+        "https://gihozo.pythonanywhere.com/create_activity/",
         formData,
         {
           headers: {
