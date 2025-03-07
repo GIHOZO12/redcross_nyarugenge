@@ -11,7 +11,7 @@ const Adminactivities = () => {
 
   useEffect(() => {
     axios
-      .get('http://127.0.0.1:8000/admin_activities/')
+      .get('https://gihozo.pythonanywhere.com/admin_activities/')
       .then((response) => {
         setActivities(response.data);
       })
@@ -35,7 +35,7 @@ const Adminactivities = () => {
       confirmButtonText: 'Yes, delete it',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://127.0.0.1:8000/admin/delete_activity/${id}`,{
+        axios.delete(`https://gihozo.pythonanywhere.com/admin/delete_activity/${id}`,{
           headers:{
           "X-CSRFToken": Cookies.get("csrftoken"),
           },
