@@ -6,7 +6,7 @@ const RedcrossAdmin = () => {
   const [data, setData] = useState({ family: 0, member: 0, activities: 0 });
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/admin_info/")
+    axios.get("https://gihozo.pythonanywhere.com/admin_info/")
       .then((response) => {
         setData(response.data);
       })
