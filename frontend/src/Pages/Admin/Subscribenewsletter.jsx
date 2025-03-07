@@ -6,7 +6,7 @@ const Subscribenewsletter = () => {
     const [subscriptions, setSubscriptions] = useState([]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/all_subscribes/")
+        axios.get("https://gihozo.pythonanywhere.com/all_subscribes/")
             .then((res) => {
                 setSubscriptions(res.data);
             })
