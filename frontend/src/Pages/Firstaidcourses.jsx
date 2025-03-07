@@ -8,7 +8,7 @@ const Firstaidcourses = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/first-aid_course/")
+      .get("https://gihozo.pythonanywhere.com/first-aid_course/")
       .then((response) => {
         console.log("API Response:", response.data);
         setCourses(response.data);
