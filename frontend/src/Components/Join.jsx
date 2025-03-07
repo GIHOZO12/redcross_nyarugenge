@@ -1,102 +1,80 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
-import { AppContext } from "../AppContext/Appcontext"
+import { AppContext } from "../AppContext/Appcontext";
+import axios from "axios";
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
-  const [showLogin, setShowLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { setUser } = useContext(AppContext);
-  const [csrfToken, setCsrfToken] = useState("");
+  const { setUser, showlogin, setshowlogin } = useContext(AppContext);
 
-  // Fetch CSRF token on component mount
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/user_get_token/", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setCsrfToken(data.csrfToken);
-      })
-      .catch((error) => {
-        console.error("Error fetching CSRF token:", error);
-      });
-  }, []);
-
-  // Handle Login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000//api/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": csrfToken,
-        },
-        body: new URLSearchParams({
-          email: email,
-          password: password,
-        }),
+      const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+        email,
+        password,
       });
-      const data = await response.json();
-      if (data.status) {
-        localStorage.setItem("accessToken", data.access_token);
-        localStorage.setItem("refreshToken", data.refresh_token);
-        setUser({
-          is_authenticated: true,
-          username: data.user.username,
-          is_superuser: data.user.is_superuser,
-          is_staff: data.user.is_staff,
-        });
-        setTimeout(() => {
-          window.location.href = data.redirect_url;
-        },500);
+  
+      const { access, refresh, username, is_superuser, is_staff } =
+        response.data;
+  
+      // Store tokens in localStorage
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      localStorage.setItem("username", username);
+      localStorage.setItem("is_superuser", is_superuser);
+      localStorage.setItem("is_staff", is_staff);
+  
     
+      document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
+  
+  
+      axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+  
    
-      } else {
-        setMessage(data.message || "Login failed");
-      }
+      setUser({
+        is_authenticated: true,
+        username: response.data.username,
+        is_superuser: true,
+        is_staff: true,
+      });
+  
+      // Hide login modal
+      setshowlogin(false);
+  
+      // Redirect after login
+      window.location.href = "/";
     } catch (error) {
-      console.error("Error during login:", error);
-      setMessage("An error occurred during login");
+      setMessage(error.response?.data?.message || "Login failed");
     }
   };
+  
 
-  // Handle Register
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:8000/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
-        }),
-      });
-      const data = await response.json();
-      if (data.status) {
-        setMessage(data.message);
-        setState("login"); // Switch to login form after successful registration
-      } else {
-        setMessage(data.message || "Registration failed");
-      }
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/register/",
+        {
+          username,
+          email,
+          password,
+        }
+      );
+
+      setMessage(response.data.message || "Registration successful!");
     } catch (error) {
-      console.error("Error during registration:", error);
-      setMessage("An error occurred during registration");
+      setMessage(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
     <>
-      {showLogin && (
+      {showlogin && (
         <div className="fixed top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
           <div>
             <form
@@ -109,7 +87,9 @@ const Join = () => {
                   : "Create an account to get started!"}
               </p>
 
-              {message && <p className="text-red-500 text-center mb-4">{message}</p>}
+              {message && (
+                <p className="text-red-500 text-center mb-4">{message}</p>
+              )}
 
               {state === "login" ? (
                 <>
@@ -119,6 +99,7 @@ const Join = () => {
                       type="email"
                       placeholder="Email"
                       className="flex-1 outline-none"
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -129,6 +110,7 @@ const Join = () => {
                       type="password"
                       placeholder="Password"
                       className="flex-1 outline-none"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -140,7 +122,9 @@ const Join = () => {
                       className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
                     />
                   </div>
-                  <a href="" className="text-center text-blue-600 p-2">Forgot password</a>
+                  <a href="#" className="text-center text-blue-600 p-2">
+                    Forgot password?
+                  </a>
                   <p className="mt-4 text-sm text-center">
                     New to the app?{" "}
                     <a
@@ -160,6 +144,7 @@ const Join = () => {
                       type="text"
                       placeholder="Username"
                       className="flex-1 outline-none"
+                      value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
                     />
@@ -170,6 +155,7 @@ const Join = () => {
                       type="email"
                       placeholder="Email"
                       className="flex-1 outline-none"
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
@@ -180,6 +166,7 @@ const Join = () => {
                       type="password"
                       placeholder="Password"
                       className="flex-1 outline-none"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -192,7 +179,7 @@ const Join = () => {
                     />
                   </div>
                   <p className="mt-4 text-sm text-center">
-                    I already have an account?{" "}
+                    Already have an account?{" "}
                     <a
                       href="#"
                       className="text-blue-600 hover:underline"
@@ -206,7 +193,7 @@ const Join = () => {
 
               <FaTimes
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer text-lg"
-                onClick={() => setShowLogin(false)}
+                onClick={() => setshowlogin(false)}
               />
             </form>
           </div>

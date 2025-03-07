@@ -96,7 +96,7 @@ def login_info(request):
 def user_get_token(request):
     return JsonResponse({"csrfToken": get_token(request)})
 
-
+@csrf_exempt
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def check_auth(request):
@@ -884,9 +884,9 @@ def messages_info(request):
         if not name or not email or not description:
             return JsonResponse({"status": False, "message": "All fields are required"}, status=400)
 
-        # Process the data (e.g., save to the database)
-        return JsonResponse({"status": True, "message": "Idea submitted successfully"})
-
+        message = Messages(name=name, email=email, description=description)
+        message.save()
+        return JsonResponse({"status": True, "message": "Message submitted successfully"})
     return JsonResponse({"status": False, "message": "Invalid request method"}, status=405)
     
 def admin_messages(request):

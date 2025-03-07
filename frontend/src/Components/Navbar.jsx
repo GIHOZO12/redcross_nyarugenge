@@ -24,37 +24,54 @@ const Navbar = () => {
 
 
  
-
-
-  // Handle logout
   const handleLogout = async () => {
-    try {
-      const response = await fetch("cd", {
-        method: "POST",
-        credentials: "include", // Include cookies for session-based auth
-      });
-      const data = await response.json();
-      if (data.status) {
-        // Clear frontend authentication state
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        setUser({
-          is_authenticated: false,
-          username: "",
-          is_superuser: false,
-          is_staff: false,
-        });
-        navigate("/"); // Redirect to homepage
-      } else {
-        console.error("Logout failed:", data.message);
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
+    const refreshToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('refresh_token='))
+        ?.split('=')[1];
+
+    if (!refreshToken) {
+        console.error("Refresh token is missing.");
+        return;
     }
-  };
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/logout/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ refresh: refreshToken })  // Send refresh token in body
+        });
+
+        if (!response.ok) {
+            console.error("Logout failed:", response.status, response.statusText);
+        } else {
+            console.log("Logged out successfully");
+
+            // Clear local storage
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("is_superuser");
+            localStorage.removeItem("is_staff");
+
+            // Clear refresh token cookie
+            document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
+
+            // Redirect to home page
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error("Error logging out:", error);
+    }
+};
 
 
+    
   
+
 
 
 

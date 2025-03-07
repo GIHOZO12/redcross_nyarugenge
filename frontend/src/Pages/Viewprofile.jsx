@@ -9,7 +9,7 @@ const Viewprofile = () => {
   const [Profile,setProfile]=useState([])
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/user_profile/", {
+    axios.get("http://127.0.0.1:8000/api/current_user/", {
       withCredentials: true 
     })
     .then((response) => {
@@ -30,7 +30,7 @@ const Viewprofile = () => {
               <div className='w-full max-w-md bg-white rounded-lg p-5 shadow-lg'>
                  {Profile &&(
                   <div className='flex  justify-between items-center'>
-                    <img src={Profile.profile_image} alt='profile_pic' className='w-20 h-20 mx-auto mb-5'></img>
+                      <img src={Profile.profile_image} alt='profile_pic' className='w-20 h-20 mx-auto mb-5'></img>
                     <div>
                     <h2 className='text-center text-2xl font-bold text-red-500'><span>name:</span>{Profile.username}</h2>
                     <p className='text-center text-gray-600'>  <span>email:</span>{Profile.email}</p>
