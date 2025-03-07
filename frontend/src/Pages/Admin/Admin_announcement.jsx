@@ -26,7 +26,7 @@ const Admin_announcement = () => {
 
     // Fetch announcements
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/admin_announcement/", { withCredentials: true })
+        axios.get("https://gihozo.pythonanywhere.com/admin_announcement/", { withCredentials: true })
             .then(response => {
                 setanounce(response.data.announcements);
             })
@@ -54,7 +54,7 @@ const Admin_announcement = () => {
             confirmButtonText: "Yes, delete it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://127.0.0.1:8000/admin_delete_announcement/${id}/`, {
+                axios.delete(`https://gihozo.pythonanywhere.com/admin_delete_announcement/${id}/`, {
                     headers: {
                         "X-CSRFToken": getCookie("csrftoken"),  // Include CSRF token in header
                         "Content-Type": "application/json"
