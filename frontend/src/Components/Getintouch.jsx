@@ -35,7 +35,7 @@ const Getintouch = () => {
 
     try{
       const csrfToken=getCookie('csrftoken')
-      const response =await axios.post("http://127.0.0.1:8000/add_email_toseubscribenewsletter/",data,{
+      const response =await axios.post("https://gihozo.pythonanywhere.com/add_email_toseubscribenewsletter/",data,{
         headers:{
           "Content-Type":"multipart/form-data",
           "X-CSRFToken":csrfToken
