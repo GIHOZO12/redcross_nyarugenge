@@ -15,7 +15,7 @@ const Add_activities = () => {
 
   // Fetch CSRF token from Django
   useEffect(() => {
-     axios.get("http://127.0.0.1:8000/get-csrf-token/", { withCredentials: true })
+     axios.get("https://gihozo.pythonanywhere.com/get-csrf-token/", { withCredentials: true })
        .then((res) => setCsrfToken(res.data.csrfToken))
       .catch((err) => console.error("CSRF token error:", err));
   }, []);
