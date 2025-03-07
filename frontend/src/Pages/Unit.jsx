@@ -22,7 +22,7 @@ const UnitFamily = () => {
         const membersResponse = await axios.get("https://gihozo.pythonanywhere.com/family_members/unit/");
         setMembers(membersResponse.data.members);
 
-        const activitiesResponse = await axios.get("http://127.0.0.1:8000/family_activities/unit/");
+        const activitiesResponse = await axios.get("https://gihozo.pythonanywhere.com/family_activities/unit/");
         setActivities(activitiesResponse.data.activities);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -70,7 +70,7 @@ const UnitFamily = () => {
     if (result.isConfirmed) {
       try {
         const response = await axios.delete(
-          `http://127.0.0.1:8000/family_delete_activity/${id}/`,
+          `https://gihozo.pythonanywhere.com/family_delete_activity/${id}/`,
           {
             headers: {
               "X-CSRFToken": csrfToken,
