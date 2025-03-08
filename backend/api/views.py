@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt,csrf_protect,ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
-from.serial import UserSerializer,FamilySerializer,AnnouncementSerializer,MembersSerializer,Felloweshipserializer,Redcrossactivitiesserializer,FirstAidCourseSerializer
+from .serial import UserSerializer,FamilySerializer,AnnouncementSerializer,MembersSerializer,Felloweshipserializer,Redcrossactivitiesserializer,FirstAidCourseSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView 
 from rest_framework_simplejwt.tokens import RefreshToken 
 from .serial import LoginSerializer
@@ -224,7 +224,7 @@ class LogoutView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    @csrf_protect  # Ensure CSRF protection on this view
+    @csrf_protect
     def post(self, request):
         try:
             refresh_token = request.COOKIES.get("refresh_token")

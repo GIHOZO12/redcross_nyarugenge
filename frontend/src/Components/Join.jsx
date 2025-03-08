@@ -19,8 +19,7 @@ const Join = () => {
         password,
       });
   
-      const { access, refresh, username, is_superuser, is_staff } =
-        response.data;
+      const { access, refresh, username, is_superuser, is_staff } = response.data;
   
       // Store tokens in localStorage
       localStorage.setItem("access_token", access);
@@ -29,13 +28,13 @@ const Join = () => {
       localStorage.setItem("is_superuser", is_superuser);
       localStorage.setItem("is_staff", is_staff);
   
-    
+      // Set refresh_token in cookies
       document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
   
-  
+      // Set axios Authorization header
       axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
   
-   
+      // Update user state
       setUser({
         is_authenticated: true,
         username: response.data.username,
@@ -52,13 +51,12 @@ const Join = () => {
       setMessage(error.response?.data?.message || "Login failed");
     }
   };
-  
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://gihozo.pythonanywhere.com//api/register/",
+        "https://gihozo.pythonanywhere.com/api/register/",
         {
           username,
           email,
