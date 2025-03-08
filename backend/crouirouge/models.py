@@ -15,6 +15,8 @@ role=[
 class User(AbstractUser):
     role=models.CharField(max_length=120,choices=role,default='child')
     profile_image=models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    first_name=models.CharField(max_length=120)
+    last_name=models.CharField(max_length=120)
     username=models.CharField(max_length=120,unique=True)
     email=models.EmailField(max_length=120,unique=True)
     is_active=models.BooleanField(default=True)
@@ -26,7 +28,43 @@ class User(AbstractUser):
          verbose_name_plural = "Users"
     def __str__(self):
         return self.username
+blood_donated=[
+        ('yes','yes'),
+        ('no','no')
+]
 
+gender_choices=[
+        ('Male','Male'),
+        ('Female','Female'),
+        ('Other','Other')
+     ]
+class Address(models.Model):
+     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="address")
+     province=models.CharField(max_length=120)
+     district=models.CharField(max_length=120)
+     sector=models.CharField(max_length=120)
+     cell=models.CharField(max_length=120)
+     village=models.CharField(max_length=120)
+class BloodDonation(models.Model):
+     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="blood_donation")
+     donated=models.CharField(max_length=120,choices=blood_donated)
+     donated_times=models.IntegerField()
+
+
+class Generalinformation(models.Model):
+     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="general_information")
+     nationalId=models.IntegerField(unique=True)
+     gender=models.CharField(max_length=120,choices=gender_choices)
+     department=models.CharField(max_length=120)
+     address=models.OneToOneField(Address,on_delete=models.CASCADE,related_name="general_information")
+     blood_donated=models.OneToOneField(BloodDonation,on_delete=models.CASCADE,related_name="general_information")
+     class Meta:
+          verbose_name="General Information"
+          verbose_name_plural = "General Informations"
+          def __str__(self):
+               return self.user.username
+
+      
 
 
 class Family(models.Model):

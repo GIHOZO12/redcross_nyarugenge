@@ -4,6 +4,7 @@
 import axios from 'axios'
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react'
+import User_info from './Profile/User_info'
 
 const Viewprofile = () => {
   const [Profile,setProfile]=useState([])
@@ -24,9 +25,10 @@ const Viewprofile = () => {
   
 
   return (
+ 
     <div className='min-h-screen  pt-16 pb-6'>
-            <h1 className='tetx-xl font-bold text-center p-5'> Profile information</h1>
-            <div className='flex justify-center pt-16'>
+            <h1 className='tetx-xl font-bold  p-5'> Profile information</h1>
+            <div className='flex  pt-16'>
               <div className='w-full max-w-md bg-white rounded-lg p-5 shadow-lg'>
                  {Profile &&(
                   <div className='flex  justify-between items-center'>
@@ -38,7 +40,9 @@ const Viewprofile = () => {
                     </div>
                  )}
               </div>
+      
             </div>
+            <User_info/> 
    </div>
   )
 }
