@@ -8,6 +8,10 @@ class UserSerializer(serializers.ModelSerializer):
             model=User
             fields=["id","username","email","role","password","profile_image"]
             extra_kwargs={"id":{"read_only":True,"required":False},"password":{"write_only":True,"required":False},"role":{"read_only":True,"required":False},"profile_image":{"required":False}}
+      def get_profile_image(self, obj):
+        if obj.profile_image:
+            return self.context['request'].build_absolute_uri(obj.profile_image.url)
+        return None      
       def create(self, validated_data):
            user=User.objects.create_user(**validated_data)
            return user   
