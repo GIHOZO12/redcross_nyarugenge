@@ -112,9 +112,7 @@ const Universality = () => {
   const isFamilyParent =
   user?.is_authenticated &&
   familyData &&
-  familyData.father && // Ensure father exists
-  familyData.mother || // Ensure mother exists
-  (user.id === familyData.father.id || user.id === familyData.mother.id);
+  (user.id === familyData.father?.id || user.id === familyData.mother?.id);
 
 
 

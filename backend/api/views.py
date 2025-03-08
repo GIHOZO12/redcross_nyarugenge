@@ -227,7 +227,7 @@ class LogoutView(APIView):
     @csrf_protect
     def post(self, request):
         try:
-            refresh_token = request.COOKIES.get("refresh_token")
+            refresh_token = request.data.get("refresh")
             if not refresh_token:
                 return Response({"success": False, "message": "No refresh token found."}, status=400)
 

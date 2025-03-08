@@ -108,11 +108,9 @@ const UnitFamily = () => {
     );
   }
   const isFamilyParent =
-  user?.is_authenticated &&
-  familyData &&
-  familyData.father && // Ensure father exists
-  familyData.mother || // Ensure mother exists
-  (user.id === familyData.father.id || user.id === familyData.mother.id);
+    user?.is_authenticated &&
+    familyData &&
+    (user.id === familyData.father?.id || user.id === familyData.mother?.id);
 
 
 

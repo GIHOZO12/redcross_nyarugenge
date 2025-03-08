@@ -33,15 +33,22 @@ const Navbar = () => {
       ?.split('=')[1];
   
     if (!refreshToken) {
-      console.error("Refresh token is missing.");
+      console.error("Refresh token is missing. Cookies:", document.cookie);
       return;
     }
+  
+    // Retrieve CSRF token from cookies
+    const csrfToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1];
   
     try {
       const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,  // Include CSRF token in headers
         },
         credentials: "include",  // Ensure cookies are sent with the request
         body: JSON.stringify({ refresh: refreshToken })  // Send refresh token in body
@@ -69,7 +76,6 @@ const Navbar = () => {
       console.error("Error logging out:", error);
     }
   };
-    
   
 
 
