@@ -876,14 +876,11 @@ def messages_info(request):
     if request.method == "POST":
         logger.info(f"CSRF Token: {request.META.get('HTTP_X_CSRFTOKEN')}")
         logger.info(f"POST Data: {request.POST}")
-
         name = request.POST.get("name")
         email = request.POST.get("email")
         description = request.POST.get("description")
-
         if not name or not email or not description:
             return JsonResponse({"status": False, "message": "All fields are required"}, status=400)
-
         message = Messages(name=name, email=email, description=description)
         message.save()
         return JsonResponse({"status": True, "message": "Message submitted successfully"})

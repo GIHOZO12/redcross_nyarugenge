@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 import Logo from "../assets/logo.png";
+import Logo1 from '../assets/red cross logo.jpg'
 import profile_icon from "../assets/profile_icon.png";
 import { AppContext } from "../AppContext/Appcontext";
 
@@ -25,50 +26,49 @@ const Navbar = () => {
 
  
   const handleLogout = async () => {
+    // Retrieve refresh_token from cookies
     const refreshToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('refresh_token='))
-        ?.split('=')[1];
-
+      .split('; ')
+      .find(row => row.startsWith('refresh_token='))
+      ?.split('=')[1];
+  
     if (!refreshToken) {
-        console.error("Refresh token is missing.");
-        return;
+      console.error("Refresh token is missing.");
+      return;
     }
-
+  
     try {
-        const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ refresh: refreshToken })  // Send refresh token in body
-        });
-
-        if (!response.ok) {
-            console.error("Logout failed:", response.status, response.statusText);
-        } else {
-            console.log("Logged out successfully");
-
-            // Clear local storage
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            localStorage.removeItem("username");
-            localStorage.removeItem("is_superuser");
-            localStorage.removeItem("is_staff");
-
-            // Clear refresh token cookie
-            document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
-
-            // Redirect to home page
-            window.location.href = "/";
-        }
+      const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",  // Ensure cookies are sent with the request
+        body: JSON.stringify({ refresh: refreshToken })  // Send refresh token in body
+      });
+  
+      if (!response.ok) {
+        console.error("Logout failed:", response.status, response.statusText);
+      } else {
+        console.log("Logged out successfully");
+  
+        // Clear local storage
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("is_superuser");
+        localStorage.removeItem("is_staff");
+  
+        // Clear refresh token cookie
+        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
+  
+        // Redirect to home page
+        window.location.href = "/";
+      }
     } catch (error) {
-        console.error("Error logging out:", error);
+      console.error("Error logging out:", error);
     }
-};
-
-
+  };
     
   
 
@@ -131,7 +131,7 @@ const Navbar = () => {
         {/* Logo */}
         <div>
           <Link to="/" onClick={() => navigate("/")}>
-            <img src={Logo} alt="Logo" className="h-10 w-auto" />
+            <img src={Logo1} alt="Logo" className="h-10 w-auto" />
           </Link>
         </div>
 
