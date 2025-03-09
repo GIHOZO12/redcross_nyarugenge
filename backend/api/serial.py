@@ -5,7 +5,6 @@ from crouirouge.models import User,Family,Announcement,Members,Fellowership,Redc
 
 class UserSerializer(serializers.ModelSerializer):
     profile_image = serializers.SerializerMethodField()  # Add this line
-
     class Meta:
         model = User
         fields = ["id", "username", "email", "role", "password", "profile_image"]
@@ -17,13 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def get_profile_image(self, obj):
-        if obj.profile_image:
+        if obj.profile_image:  # Check if profile_image exists
             return self.context['request'].build_absolute_uri(obj.profile_image.url)
-        return None
+        return None  # Return None if no image is set
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        return user  
+        return user 
 
 class FamilySerializer(serializers.ModelSerializer):
       class Meta:
