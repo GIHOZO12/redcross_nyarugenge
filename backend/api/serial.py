@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id": {"read_only": True, "required": False},
             "password": {"write_only": True, "required": False},
             "role": {"read_only": True, "required": False},
-            "profile_image": {"required": False},
+            "profile_image": {"required": True},
         }
 
     def get_profile_image(self, obj):
