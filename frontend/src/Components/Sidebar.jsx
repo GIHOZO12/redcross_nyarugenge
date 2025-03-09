@@ -121,7 +121,7 @@ const Sidebar = () => {
               <Link to="/admin/admin_courses" className="block p-3 rounded hover:bg-blue-700">First Aid Courses</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/messages" className="block p-3 rounded hover:bg-blue-700">Messages</Link>
+                            <Link to="/admin/messages" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>Messages<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allmessage}</span></Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
               <Link to="/admin/announcement" className="block p-3 rounded hover:bg-blue-700">Announcements</Link>
