@@ -36,6 +36,7 @@ const Viewprofile = () => {
                     <div>
                     <h2 className='text-center text-2xl font-bold text-red-500'><span>name:</span>{Profile.username}</h2>
                     <p className='text-center text-gray-600'>  <span>email:</span>{Profile.email}</p>
+                    <p className='text-center text-gray-600'>  <span>role:</span>{Profile.role}</p>
                     </div>
                     </div>
                  )}
