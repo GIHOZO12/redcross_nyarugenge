@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 // import Logo from "../assets/logo.png";
-import Logo1 from '../assets/Red cross logo p.png';
+import Logo1 from '../assets/Red cross logo.jpg';
 import profile_icon from "../assets/profile_icon.png";
 import { AppContext } from "../AppContext/Appcontext";
 
