@@ -1,14 +1,50 @@
-// Navdata.js
-import React from 'react';
+import React, { useState } from 'react';
 
 const Navdata = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [profilePic, setProfilePic] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append('first_name', firstName);
+    formData.append('last_name', lastName);
+    if (profilePic) {
+      formData.append('profile_image', profilePic);
+    }
+  
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/add_user_info/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,  // Include the access token
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Profile updated successfully:', data);
+        setFirstName('')
+        setLastName('')
+        setProfilePic(null)
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to update profile:', errorData);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   return (
     <div className='p-4'>
-      <section className='  p-6 max-w-2xl mx-auto'>
+      <section className='p-6 max-w-2xl mx-auto'>
         <h2 className='text-2xl font-bold text-gray-800 mb-6 text-center'>
           Complete Your Profile
         </h2>
-        <form className='space-y-6'>
+        <form className='space-y-6' onSubmit={handleSubmit}>
           {/* First Name Field */}
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -18,6 +54,8 @@ const Navdata = () => {
               type='text'
               name='fname'
               required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
               placeholder='Enter your first name'
             />
@@ -32,17 +70,23 @@ const Navdata = () => {
               type='text'
               name='lname'
               required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
               placeholder='Enter your last name'
             />
           </div>
-          {/* profile picture Field */}
+
+          {/* Profile Picture Field */}
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>profile image</label>
-            <input type='file' name='profile_pic' className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all' />
-
+            <label className='block text-sm font-medium text-gray-700 mb-1'>Profile image</label>
+            <input
+              type='file'
+              name='profile_pic'
+              onChange={(e) => setProfilePic(e.target.files[0])}
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
+            />
           </div>
-
 
           {/* Submit Button */}
           <div>

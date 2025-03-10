@@ -1,117 +1,120 @@
-/* eslint-disable no-undef */
-// eslint-disable-next-line no-unused-vars
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
-// import Logo from "../assets/logo.png";
 import Logo1 from '../assets/Red cross logo.jpg';
 import profile_icon from "../assets/profile_icon.png";
 import { AppContext } from "../AppContext/Appcontext";
-
-
-
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isFamiliesDropdownOpen, setIsFamiliesDropdownOpen] = useState(false);
   const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
-  
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { setshowlogin, user = {}, setUser } = useContext(AppContext);
-  const  {setshowpayment}=useContext(AppContext);
- 
+  const { setshowpayment } = useContext(AppContext);
+  const [profileImage, setProfileImage] = useState(null); // State to store profile image
 
+  // Fetch current user data
+  const fetchCurrentUser = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
 
- 
+    try {
+      const response = await fetch("https://gihozo.pythonanywhere.com/api/current_user/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Current User Data:", data);
+        setProfileImage(data.profile_image); // Set profile image
+      } else {
+        console.error("Failed to fetch current user");
+      }
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
+  };
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
   const handleLogout = async () => {
-    // Retrieve refresh_token from cookies
+    const accessToken = localStorage.getItem("access_token");
+    if (!accessToken) {
+      console.error("User is not authenticated.");
+      return;
+    }
+
     const refreshToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('refresh_token='))
       ?.split('=')[1];
-  
+
     if (!refreshToken) {
       console.error("Refresh token is missing. Cookies:", document.cookie);
       return;
     }
-  
-    // Retrieve CSRF token from cookies
+
     const csrfToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('csrftoken='))
       ?.split('=')[1];
-  
+
+    if (!csrfToken) {
+      console.error("CSRF token is missing. Cookies:", document.cookie);
+      return;
+    }
+
     try {
       const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,  // Include CSRF token in headers
+          "X-CSRFToken": csrfToken,
         },
-        credentials: "include",  // Ensure cookies are sent with the request
-        body: JSON.stringify({ refresh: refreshToken })  // Send refresh token in body
+        credentials: "include",
+        body: JSON.stringify({ refresh: refreshToken }),
       });
-  
+
       if (!response.ok) {
         console.error("Logout failed:", response.status, response.statusText);
       } else {
         console.log("Logged out successfully");
-  
-        // Clear local storage
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("username");
         localStorage.removeItem("is_superuser");
         localStorage.removeItem("is_staff");
-  
-        // Clear refresh token cookie
         document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
-  
-        // Redirect to home page
         window.location.href = "/";
       }
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-  
-
-
-
 
   const dropdownVariants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
   };
 
-  // References to detect clicks outside the dropdowns
   const familiesDropdownRef = useRef(null);
   const eventDropdownRef = useRef(null);
-  const languageDropdownRef = useRef(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (
-        familiesDropdownRef.current &&
-        !familiesDropdownRef.current.contains(event.target)
-      ) {
+      if (familiesDropdownRef.current && !familiesDropdownRef.current.contains(event.target)) {
         setIsFamiliesDropdownOpen(false);
       }
-      if (
-        eventDropdownRef.current &&
-        !eventDropdownRef.current.contains(event.target)
-      ) {
+      if (eventDropdownRef.current && !eventDropdownRef.current.contains(event.target)) {
         setIsEventDropdownOpen(false);
-      }
-
-      if (
-        languageDropdownRef.current &&
-        !languageDropdownRef.current.contains(event.target)
-      ) {
-        setIsLanguageDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -119,17 +122,6 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
-
-
-
-
-
-
-
-  
-
 
   return (
     <div className="fixed top-0 left-0 w-full bg-red-500 shadow-md z-50">
@@ -171,7 +163,7 @@ const Navbar = () => {
                 className="flex items-center hover:text-gray-300"
                 onClick={() => setIsFamiliesDropdownOpen((prev) => !prev)}
               >
-              families   <FaChevronDown className="ml-1" />
+                Families <FaChevronDown className="ml-1" />
               </div>
 
               {isFamiliesDropdownOpen && (
@@ -220,7 +212,7 @@ const Navbar = () => {
                 className="flex items-center hover:text-gray-300"
                 onClick={() => setIsEventDropdownOpen((prev) => !prev)}
               >
-                events <FaChevronDown className="ml-1" />
+                Events <FaChevronDown className="ml-1" />
               </div>
 
               {isEventDropdownOpen && (
@@ -247,30 +239,27 @@ const Navbar = () => {
 
             <Link to="/Courses" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="text-white cursor-pointer hover:text-gray-300">
-                courses
+                Courses
               </li>
             </Link>
 
             <Link to="/update" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="text-white cursor-pointer hover:text-gray-300">
-                update
+                Update
               </li>
             </Link>
-           
 
             <Link to="/ideas" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="text-white cursor-pointer hover:text-gray-300">
-                 ideasbox
-              </li>
-            </Link>
-            <Link to="" onClick={() => setshowpayment(true)}>
-              <li className="text-white cursor-pointer hover:text-gray-300" onClick={()=>setIsMobileMenuOpen(false)}>
-                Donate
+                Ideas Box
               </li>
             </Link>
 
-           
-            
+            <Link to="" onClick={() => setshowpayment(true)}>
+              <li className="text-white cursor-pointer hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>
+                Donate
+              </li>
+            </Link>
 
             {user.is_authenticated && (user.is_superuser || user.is_staff) && (
               <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
@@ -280,7 +269,6 @@ const Navbar = () => {
               </Link>
             )}
 
-           
             {user.is_authenticated && user.is_superuser && (
               <Link to={`${import.meta.env.VITE_BACKEND_URL}/admin/`} onClick={() => setIsMobileMenuOpen(false)}>
                 <li className="text-white cursor-pointer hover:text-gray-300">
@@ -291,16 +279,27 @@ const Navbar = () => {
           </ul>
         </nav>
 
-        
+        {/* User Profile Section */}
         {user.is_authenticated ? (
           <div className="relative group flex items-center px-4 gap-3">
             <p className="text-gray-100 max-sm:hidden">Hi, {user.username}</p>
-            
-            <img
-              src={profile_icon}
-              alt="User"
-              className="h-8 w-8 rounded-full border"
-            />
+            {profileImage ? (
+              <img
+                src={`https://gihozo.pythonanywhere.com${profileImage}`}
+                alt="Profile"
+                className="h-8 w-8 rounded-full border"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = profile_icon;
+                }}
+              />
+            ) : (
+              <img
+                src={profile_icon}
+                alt="Profile Icon"
+                className="h-8 w-8 rounded-full border"
+              />
+            )}
             <div className="absolute hidden group-hover:block top-8 right-0 z-50 bg-black text-white rounded-md shadow-lg">
               <ul className="list-none m-0 p-2 text-sm">
                 <Link to="/Viewprofile">
@@ -309,11 +308,11 @@ const Navbar = () => {
                   </li>
                 </Link>
                 <li
-  className="py-2 px-4 cursor-pointer hover:text-red-400"
-  onClick={handleLogout}
->
-  Logout
-</li>
+                  className="py-2 px-4 cursor-pointer hover:text-red-400"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </li>
               </ul>
             </div>
           </div>

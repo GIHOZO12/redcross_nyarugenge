@@ -4,21 +4,26 @@ from django.contrib.auth import authenticate
 from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
 
 class UserSerializer(serializers.ModelSerializer):
-    profile_image = serializers.SerializerMethodField()  # Add this line
+    profile_image = serializers.ImageField(required=False)  # Make it writable
+
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role", "password", "profile_image"]
+        fields = ["id", "username", "email", "role", "first_name", "last_name", "password", "profile_image"]
         extra_kwargs = {
             "id": {"read_only": True, "required": False},
+            "username": {"read_only": True, "required": False},  # Make username read-only
+            "email": {"read_only": True, "required": False},     # Make email read-only
             "password": {"write_only": True, "required": False},
             "role": {"read_only": True, "required": False},
-            "profile_image": {"required": True},
+            "profile_image": {"required": False},
+            "first_name": {"required": False},
+            "last_name": {"required": False},
         }
 
     def get_profile_image(self, obj):
         if obj.profile_image:  # Check if profile_image exists
             return self.context['request'].build_absolute_uri(obj.profile_image.url)
-        return None  # Return None if no image is set
+        return None  # Return None if no image is setrn NOTE: This line is not needed, as we are not using it in the frontend.
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
