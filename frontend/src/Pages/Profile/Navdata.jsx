@@ -16,7 +16,7 @@ const Navdata = () => {
     }
   
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/add_user_info/', {
+      const response = await fetch('https://gihozo.pythonanywhere.com/api/add_user_info/', {
         method: 'POST',
         body: formData,
         headers: {
