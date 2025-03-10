@@ -183,7 +183,28 @@ def current_user(request):
     return Response(serializer.data)
 
 
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])  # Use JWT authentication
+@permission_classes([IsAuthenticated])  # Require authenticated users
+def add_user_info(request):
+    print(request.data)  # Log incoming data
+    try:
+        # Fetch the existing user instance
+        user = request.user  # Get the authenticated user
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Use partial=True to allow partial updates
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    print(serializer.errors)  # Log validation errors
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -219,25 +240,23 @@ class LoginView(APIView):
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this endpoint
 
-    @csrf_protect
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
             if not refresh_token:
-                return Response({"success": False, "message": "No refresh token found."}, status=400)
+                return Response({"success": False, "message": "No refresh token found."}, status=status.HTTP_400_BAD_REQUEST)
 
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            # Verify the refresh token
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()  # Blacklist the refresh token
+            except Exception as e:
+                return Response({"success": False, "message": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
 
-            res = Response({"success": True, "message": "Logged out successfully."})
-            res.delete_cookie("access_token", path="/", samesite="None", secure=True)
-            res.delete_cookie("refresh_token", path="/", samesite="None", secure=True)
-
-            return res
+            return Response({"success": True, "message": "Logged out successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"success": False, "message": str(e)}, status=500)
+            return Response({"success": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
