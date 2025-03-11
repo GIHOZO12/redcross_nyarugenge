@@ -285,7 +285,7 @@ const Navbar = () => {
             <p className="text-gray-100 max-sm:hidden">Hi, {user.username}</p>
             {profileImage ? (
               <img
-                src={`https://gihozo.pythonanywhere.com${profileImage}`}
+                src={`https://gihozo.pythonanywhere.com/${profileImage}`}
                 alt="Profile"
                 className="h-8 w-8 rounded-full border"
                 onError={(e) => {

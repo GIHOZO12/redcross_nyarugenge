@@ -15,9 +15,7 @@ const Viewprofile = () => {
       if (!token) {
         console.error('Failed to refresh token. Redirecting to login...');
         localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
-         // Redirect to login page
+        localStorage.removeItem('refresh_token'); // Redirect to login page
         return;
       }
     }
@@ -54,7 +52,7 @@ const Viewprofile = () => {
           {Profile && (
             <div className='flex justify-between items-center'>
               <img
-                src={Profile.profile_image ? `https://gihozo.pythonanywhere.com${Profile.profile_image}` : '../assets/logo.png'}
+                src={Profile.profile_image ? `https://gihozo.pythonanywhere.com/${Profile.profile_image}` : '../assets/logo.png'}
                 alt='profile_pic'
                 className='w-20 h-20 mx-auto mb-5 rounded-full'
                 onError={(e) => {
@@ -64,7 +62,7 @@ const Viewprofile = () => {
               />
               <div>
                 <h2 className='text-center text-2xl font-bold text-red-500'>
-                  <span>Name:</span> {Profile.username}
+                  <span>username:</span> {Profile.username}
                 </h2>
                 <p className='text-center text-gray-600'>
                   <span>Email:</span> {Profile.email}

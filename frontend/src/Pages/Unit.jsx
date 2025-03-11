@@ -33,10 +33,7 @@ const UnitFamily = () => {
   }, []);
 
   // Check if the authenticated user is the father or mother of the family
-  const isFamilyParent =
-    user?.is_authenticated &&
-    familyData &&
-    (user.id === familyData.father?.id || user.id === familyData.mother?.id);
+
 
   const handleDeleteActivity = async (id) => {
     const csrfToken = getCookie("csrftoken");
@@ -108,13 +105,13 @@ const UnitFamily = () => {
             {familyData.name} Family
           </h1>
           {/* Add Activity Button - Only visible to father or mother */}
-          {isFamilyParent && (
+        
             <Link to="/addactivities/unit">
               <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">
                 Add activity
               </button>
             </Link>
-          )}
+       
         </div>
         <p className="text-gray-600 mt-2">
           Welcome to the {familyData.name} family page!
@@ -147,7 +144,7 @@ const UnitFamily = () => {
                     {new Date(activity.created).toLocaleString()}
                   </p>
                   {/* Edit and Delete Buttons - Only visible to father or mother */}
-                  {isFamilyParent && (
+             
                     <div className="flex justify-end p-2 gap-3">
                       <button
                         onClick={() => handleDeleteActivity(activity.id)}
@@ -164,7 +161,7 @@ const UnitFamily = () => {
                         Edit
                       </button>
                     </div>
-                  )}
+                 
                 </div>
               </div>
             ))}
