@@ -110,10 +110,7 @@ const Humanity_family = () => {
   }
 
 
-  const isFamilyParent =
-  user?.is_authenticated &&
-  familyData &&
-  (user.id === familyData.father?.id || user.id === familyData.mother?.id);
+  
 
 
  
@@ -125,9 +122,9 @@ const Humanity_family = () => {
       <header className="text-center mb-8">
         <div className="flex justify-center items-center mt-20 gap-14">
         <h1 className="text-4xl font-bold text-red-500">{familyData.name} Family</h1>
-        {isFamilyParent && (
+     
      <Link to="/addactivities/Humanity">  <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">Add activity</button></Link> 
-    )}
+   
         </div>
         <p className="text-gray-600 mt-2">
           Welcome to the {familyData.name} family page!
@@ -157,13 +154,13 @@ const Humanity_family = () => {
                   <p className="text-sm text-gray-400 mt-4">
                    {new Date(activity.created).toLocaleString()}
                   </p>
-                    {isFamilyParent && (
+                  
                   <div className="flex justify-end p-2  gap-3">
                   <button onClick={()=>handleDeleteActivity(activity.id)} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors ">Delete</button>
                   <button  onClick={()=>navigate(`/update_activity/${activity.id}/`)}
                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors mr-2 ">Edit</button>
                   </div>
-                  )}
+               
                 </div>
               </div>
             ))}
