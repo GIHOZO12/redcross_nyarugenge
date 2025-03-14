@@ -13,10 +13,25 @@ from rest_framework import generics
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.utils.decorators import method_decorator
+
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt,csrf_protect,ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
-from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
-from .serial import UserSerializer,FamilySerializer,AnnouncementSerializer,MembersSerializer,Felloweshipserializer,Redcrossactivitiesserializer,FirstAidCourseSerializer
+from crouirouge.models import (User,Family,Announcement,Members,
+                               Fellowership,
+                               RedcrossActivities,
+                               FirstAidCourse,Address,BloodDonation,Generalinformation,)
+from .serial import (UserSerializer,FamilySerializer,
+                     AnnouncementSerializer,MembersSerializer,
+                     Felloweshipserializer,
+                     Redcrossactivitiesserializer,
+                     FirstAidCourseSerializer,GeneralinformationSerializer)
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView 
 from rest_framework_simplejwt.tokens import RefreshToken 
 from .serial import LoginSerializer
@@ -260,3 +275,77 @@ class LogoutView(APIView):
             return Response({"success": True, "message": "Logged out successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"success": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+
+
+class GeneralInformation(APIView):
+    permission_classes = [AllowAny]
+    def post(self,request,*args,**kwargs):
+        serializer=GeneralinformationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class EditGeneralInformation(APIView):
+    permission_classes = [IsAuthenticated]
+    def get_object(self, user_id):
+        try:
+            return Generalinformation.objects.get(user_id=user_id)
+        except Generalinformation.DoesNotExist:
+            return None
+
+    def get(self, request, user_id, *args, **kwargs):
+        general_info = self.get_object(user_id)
+        if general_info is None:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        serializer = GeneralinformationSerializer(general_info)
+        return Response(serializer.data)
+    def put(self, request, user_id, *args, **kwargs):
+        general_info = self.get_object(user_id)
+        if general_info is None:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = GeneralinformationSerializer(general_info, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ProofOfRegistrationView(APIView):
+    def get(self, request, user_id, *args, **kwargs):
+        try:
+            # Fetch the user's registration information
+            general_info = Generalinformation.objects.get(user_id=user_id)
+
+            # Create the PDF response
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="proof_of_registration_{user_id}.pdf"'
+
+            p = canvas.Canvas(response)
+            p.setFont("Helvetica-Bold", 14)
+            p.drawString(100, 750, "Proof of Registration")
+            p.setFont("Helvetica", 12)
+
+            # Add user details to the PDF
+            p.drawString(100, 720, f"Name: {general_info.user.username}")
+            p.drawString(100, 700, f"National ID: {general_info.nationalId}")
+            p.drawString(100, 680, f"Department: {general_info.department}")
+            p.drawString(100, 660, "Thank you for registering!")
+
+            # Save and return the PDF
+            p.showPage()
+            p.save()
+
+            return response
+
+        except ObjectDoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
