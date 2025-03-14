@@ -1,7 +1,10 @@
 from rest_framework import serializers
 # from backend.api import authentication
 from django.contrib.auth import authenticate
-from crouirouge.models import User,Family,Announcement,Members,Fellowership,RedcrossActivities,FirstAidCourse
+from crouirouge.models import  (User,Family,Announcement
+                                ,Members,Fellowership,
+                                RedcrossActivities,
+                                FirstAidCourse,Address,Generalinformation,BloodDonation)
 
 class UserSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(required=False)  # Make it writable
@@ -78,4 +81,70 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Invalid email or password')
 
         attrs['user'] = user
-        return attrs                   
+        return attrs  
+
+
+
+class AddressSerializer(serializers.ModelSerializer):
+           class Meta:
+                model=Address
+                fields=["id","user","province","district","sector","cell","village"]
+                extra_kwargs={"id":{"read_only":        
+                                        True,"required":False}}
+
+
+
+
+class BloodDonationSerializer(serializers.ModelSerializer):
+           class Meta:
+                model=BloodDonation
+                fields=["id","user","donated_times"]
+                extra_kwargs={"id":{"read_only":True,"required":False}}
+
+
+class GeneralinformationSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+    blood_donated = BloodDonationSerializer()
+
+    class Meta:
+        model = Generalinformation
+        fields = '__all__'
+        extra_kwargs = {"id": {"read_only": True, "required": False}}
+
+    def create(self, validated_data):
+        address_data = validated_data.pop('address')
+        blood_donated_data = validated_data.pop('blood_donated')
+
+        # Log the incoming data
+        print("Address Data:", address_data)
+        print("Blood Donation Data:", blood_donated_data)
+        print("General Information Data:", validated_data)
+
+        address_obj = Address.objects.create(**address_data)
+        blood_donation_obj = BloodDonation.objects.create(**blood_donated_data)
+        general_information_obj = Generalinformation.objects.create(
+            address=address_obj,
+            blood_donated=blood_donation_obj,
+            **validated_data
+        )
+        return general_information_obj
+    def update(self, instance, validated_data):
+        # Update address
+        address_data = validated_data.pop('address', None)
+        if address_data:
+            for attr, value in address_data.items():
+                setattr(instance.address, attr, value)
+            instance.address.save()
+
+        # Update blood donation information
+        blood_data = validated_data.pop('blood_donated', None)
+        if blood_data:
+            for attr, value in blood_data.items():
+                setattr(instance.blood_donated, attr, value)
+            instance.blood_donated.save()
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
