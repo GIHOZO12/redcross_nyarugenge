@@ -52,6 +52,9 @@ const Navbar = () => {
       return;
     }
   
+    // Log all cookies for debugging
+    console.log("All cookies:", document.cookie);
+  
     const refreshToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('refresh_token='))
