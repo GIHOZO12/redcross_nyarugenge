@@ -4,6 +4,7 @@ import { AppContext } from "../AppContext/Appcontext";
 import axios from "axios";
 import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 import { ClipLoader } from "react-spinners"; // Import a loading spinner
+import { useNavigate } from "react-router-dom";
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
