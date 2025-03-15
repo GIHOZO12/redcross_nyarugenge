@@ -394,15 +394,22 @@ const RwandaRedCrossForm = () => {
             </div>
           </div>
 
-          <div className='text-center flex justify-between'>
-            <button
-              type='submit'
-              className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
-            >
-              {existingData ? 'Update Your Information' : 'Send Your Information'}
-            </button>
-            
-          </div>
+          <div className='text-center flex flex-col md:flex-row justify-between gap-4'>
+  <button
+    type='submit'
+    className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
+  >
+    {existingData ? 'Update Your Information' : 'Send Your Information'}
+  </button>
+  {existingData && ( // Show the button only if existingData is truthy
+    <button
+      onClick={handleDownloadProof} // Call handleDownloadProof when clicked
+      className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
+    >
+      Download Proof of Registration
+    </button>
+  )}
+</div>
         </form>
       </section>
     </div>
