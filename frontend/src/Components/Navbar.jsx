@@ -51,27 +51,27 @@ const Navbar = () => {
       console.error("User is not authenticated.");
       return;
     }
-
+  
     const refreshToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('refresh_token='))
       ?.split('=')[1];
-
+  
     if (!refreshToken) {
       console.error("Refresh token is missing. Cookies:", document.cookie);
       return;
     }
-
+  
     const csrfToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('csrftoken='))
       ?.split('=')[1];
-
+  
     if (!csrfToken) {
       console.error("CSRF token is missing. Cookies:", document.cookie);
       return;
     }
-
+  
     try {
       const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
         method: "POST",
@@ -82,9 +82,10 @@ const Navbar = () => {
         credentials: "include",
         body: JSON.stringify({ refresh: refreshToken }),
       });
-
+  
       if (!response.ok) {
         console.error("Logout failed:", response.status, response.statusText);
+        alert("Logout failed. Please try again.");
       } else {
         console.log("Logged out successfully");
         localStorage.removeItem("access_token");
@@ -92,11 +93,24 @@ const Navbar = () => {
         localStorage.removeItem("username");
         localStorage.removeItem("is_superuser");
         localStorage.removeItem("is_staff");
+        localStorage.removeItem("role");
         document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
+  
+        // Update user state in context
+        setUser({
+          is_authenticated: false,
+          username: null,
+          is_superuser: false,
+          is_staff: false,
+          role: null,
+        });
+  
+        // Redirect to homepage
         window.location.href = "/";
       }
     } catch (error) {
       console.error("Error logging out:", error);
+      alert("An error occurred during logout. Please try again.");
     }
   };
 
