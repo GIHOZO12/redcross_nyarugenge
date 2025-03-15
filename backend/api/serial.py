@@ -13,14 +13,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "username", "email", "role", "first_name", "last_name", "password", "profile_image"]
         extra_kwargs = {
-            "id": {"read_only": True, "required": False},
-            "username": {"read_only": True, "required": False},  # Make username read-only
-            "email": {"read_only": True, "required": False},     # Make email read-only
+            "id": {"read_only": True, "required": False},     # Make email read-only
             "password": {"write_only": True, "required": False},
             "role": {"read_only": True, "required": False},
-            "profile_image": {"required": False},
-            "first_name": {"required": False},
-            "last_name": {"required": False},
+            "profile_image": {"read_only": True, "required": False},
+            "first_name": {"read_only": True,"required": False},
+            "last_name": {"read_only": True,"required": False},
         }
 
     def get_profile_image(self, obj):
@@ -135,16 +133,3 @@ class GeneralinformationSerializer(serializers.ModelSerializer):
             for attr, value in address_data.items():
                 setattr(instance.address, attr, value)
             instance.address.save()
-
-        # Update blood donation information
-        blood_data = validated_data.pop('blood_donated', None)
-        if blood_data:
-            for attr, value in blood_data.items():
-                setattr(instance.blood_donated, attr, value)
-            instance.blood_donated.save()
-
-        # Update other fields
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance

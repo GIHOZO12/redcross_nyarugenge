@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
 import { AppContext } from "../AppContext/Appcontext";
 import axios from "axios";
+import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
@@ -9,33 +10,38 @@ const Join = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { setUser, showlogin, setshowlogin } = useContext(AppContext);
+  const { setUser, showlogin, setshowlogin, resetpassword, setresetpassword } =
+    useContext(AppContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://gihozo.pythonanywhere.com/api/login/", {
-        email,
-        password,
-      });
-  
-      const { access,role,refresh, username, is_superuser, is_staff } = response.data;
-  
+      const response = await axios.post(
+        "https://gihozo.pythonanywhere.com/api/login/",
+        {
+          email,
+          password,
+        }
+      );
+
+      const { access, role, refresh, username, is_superuser, is_staff } =
+        response.data;
+
       // Store tokens in localStorage
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       localStorage.setItem("username", username);
       localStorage.setItem("is_superuser", is_superuser);
       localStorage.setItem("is_staff", is_staff);
-      localStorage.setItem("role", role); 
+      localStorage.setItem("role", role);
       console.log("Role saved to local storage:", role);
-  
+
       // Set refresh_token in cookies
       document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
-  
+
       // Set axios Authorization header
       axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
-  
+
       // Update user state
       setUser({
         is_authenticated: true,
@@ -44,10 +50,10 @@ const Join = () => {
         is_staff: true,
         role: response.data.role,
       });
-  
+
       // Hide login modal
       setshowlogin(false);
-  
+
       // Redirect after login
       window.location.href = "/";
     } catch (error) {
@@ -59,7 +65,7 @@ const Join = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/api/register/",
+        "http://127.0.0.1:8000/api/register/",
         {
           username,
           email,
@@ -123,7 +129,12 @@ const Join = () => {
                       className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
                     />
                   </div>
-                  <a href="#" className="text-center text-blue-600 p-2">
+                  <a
+                    href="#"
+                    className="text-center text-blue-600 p-2"
+                    onClick={() => setresetpassword(true)
+                    }
+                  >
                     Forgot password?
                   </a>
                   <p className="mt-4 text-sm text-center">
@@ -200,6 +211,9 @@ const Join = () => {
           </div>
         </div>
       )}
+
+      {/* Render ResetPassword component if resetpassword is true */}
+      {resetpassword && <ResetPassword />}
     </>
   );
 };

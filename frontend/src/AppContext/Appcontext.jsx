@@ -14,6 +14,7 @@ const AppContextProvider = ({ children }) => {
 
   const [showlogin, setshowlogin] = useState(null);
   const [showpayment, setshowpayment] = useState(null);
+  const [resetpassword, setresetpassword] = useState(null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -45,6 +46,8 @@ const AppContextProvider = ({ children }) => {
         setshowlogin,
         showlogin,
         showpayment,
+        resetpassword,
+        setresetpassword,
         setshowpayment,
       }}
     >
