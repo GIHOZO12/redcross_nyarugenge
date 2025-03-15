@@ -268,7 +268,7 @@ class ResetPasswordView(APIView):
         if new_password != confirm_password:
             return Response({"message": "Passwords do not match"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email__exact=email)
             user.set_password(new_password)
             user.save()
             return Response({"message": "Password reset successful"}, status=status.HTTP_200_OK)
