@@ -9,6 +9,7 @@ const AppContextProvider = ({ children }) => {
     username: "",
     is_superuser: false,
     is_staff: false,
+    role:'',
   });
 
   const [showlogin, setshowlogin] = useState(null);
@@ -20,6 +21,7 @@ const AppContextProvider = ({ children }) => {
     const username = localStorage.getItem("username");
     const is_superuser = localStorage.getItem("is_superuser") === "true";
     const is_staff = localStorage.getItem("is_staff") === "true";
+    const role = localStorage.getItem("role");
 
     if (access_token && username) {
       setUser({
@@ -27,6 +29,7 @@ const AppContextProvider = ({ children }) => {
         username,
         is_superuser,
         is_staff,
+        role,
       });
 
       // Set axios Authorization header

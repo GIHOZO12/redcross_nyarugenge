@@ -8,7 +8,7 @@ const UnitFamily = () => {
   const [familyData, setFamilyData] = useState(null);
   const [activities, setActivities] = useState([]);
   const [error, setError] = useState(null);
-  const { user } = useContext(AppContext);
+  const { user } = useContext(AppContext); // Get the authenticated user from context
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const UnitFamily = () => {
   }, []);
 
   // Check if the authenticated user is the father or mother of the family
-
+  const isFatherOrMother = user?.role === "Father" || user?.role === "Mother";
 
   const handleDeleteActivity = async (id) => {
     const csrfToken = getCookie("csrftoken");
@@ -105,13 +105,13 @@ const UnitFamily = () => {
             {familyData.name} Family
           </h1>
           {/* Add Activity Button - Only visible to father or mother */}
-        
+          {isFatherOrMother && (
             <Link to="/addactivities/unit">
               <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">
                 Add activity
               </button>
             </Link>
-       
+          )}
         </div>
         <p className="text-gray-600 mt-2">
           Welcome to the {familyData.name} family page!
@@ -144,7 +144,7 @@ const UnitFamily = () => {
                     {new Date(activity.created).toLocaleString()}
                   </p>
                   {/* Edit and Delete Buttons - Only visible to father or mother */}
-             
+                  {isFatherOrMother && (
                     <div className="flex justify-end p-2 gap-3">
                       <button
                         onClick={() => handleDeleteActivity(activity.id)}
@@ -161,7 +161,7 @@ const UnitFamily = () => {
                         Edit
                       </button>
                     </div>
-                 
+                  )}
                 </div>
               </div>
             ))}
