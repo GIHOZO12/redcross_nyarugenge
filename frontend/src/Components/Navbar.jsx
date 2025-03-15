@@ -52,9 +52,7 @@ const Navbar = () => {
       return;
     }
   
-    // Log all cookies for debugging
-    console.log("All cookies:", document.cookie);
-  
+    // Retrieve refresh token from cookies
     const refreshToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('refresh_token='))
@@ -65,25 +63,15 @@ const Navbar = () => {
       return;
     }
   
-    const csrfToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      ?.split('=')[1];
-  
-    if (!csrfToken) {
-      console.error("CSRF token is missing. Cookies:", document.cookie);
-      return;
-    }
-  
     try {
+      // Send logout request to the backend
       const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
+          Authorization: `Bearer ${accessToken}`,  // Include the access token in the headers
         },
-        credentials: "include",
-        body: JSON.stringify({ refresh: refreshToken }),
+        body: JSON.stringify({ refresh: refreshToken }),  // Send refresh token in the body
       });
   
       if (!response.ok) {
@@ -91,12 +79,16 @@ const Navbar = () => {
         alert("Logout failed. Please try again.");
       } else {
         console.log("Logged out successfully");
+  
+        // Clear local storage
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("username");
         localStorage.removeItem("is_superuser");
         localStorage.removeItem("is_staff");
         localStorage.removeItem("role");
+  
+        // Clear refresh token cookie
         document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
   
         // Update user state in context
