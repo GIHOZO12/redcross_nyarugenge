@@ -3,6 +3,7 @@ import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
 import { AppContext } from "../AppContext/Appcontext";
 import axios from "axios";
 import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
+import { ClipLoader } from "react-spinners"; // Import a loading spinner
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
@@ -10,11 +11,13 @@ const Join = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const { setUser, showlogin, setshowlogin, resetpassword, setresetpassword } =
     useContext(AppContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     try {
       const response = await axios.post(
         "https://gihozo.pythonanywhere.com/api/login/",
@@ -58,11 +61,14 @@ const Join = () => {
       window.location.href = "/";
     } catch (error) {
       setMessage(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     try {
       const response = await axios.post(
         "https://gihozo.pythonanywhere.com/api/register/",
@@ -76,6 +82,8 @@ const Join = () => {
       setMessage(response.data.message || "Registration successful!");
     } catch (error) {
       setMessage(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -123,17 +131,22 @@ const Join = () => {
                     />
                   </div>
                   <div>
-                    <input
+                    <button
                       type="submit"
-                      value="Login"
-                      className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
-                    />
+                      disabled={loading} // Disable button when loading
+                      className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600 flex justify-center items-center"
+                    >
+                      {loading ? (
+                        <ClipLoader color="#ffffff" size={20} /> // Show spinner when loading
+                      ) : (
+                        "Login" // Show text when not loading
+                      )}
+                    </button>
                   </div>
                   <a
                     href="#"
                     className="text-center text-blue-600 p-2"
-                    onClick={() => setresetpassword(true)
-                    }
+                    onClick={() => setresetpassword(true)}
                   >
                     Forgot password?
                   </a>
@@ -184,11 +197,17 @@ const Join = () => {
                     />
                   </div>
                   <div>
-                    <input
+                    <button
                       type="submit"
-                      value="Register"
-                      className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600"
-                    />
+                      disabled={loading} // Disable button when loading
+                      className="bg-red-500 cursor-pointer rounded-md w-full p-2 text-white hover:bg-red-600 flex justify-center items-center"
+                    >
+                      {loading ? (
+                        <ClipLoader color="#ffffff" size={20} /> // Show spinner when loading
+                      ) : (
+                        "Register" // Show text when not loading
+                      )}
+                    </button>
                   </div>
                   <p className="mt-4 text-sm text-center">
                     Already have an account?{" "}
