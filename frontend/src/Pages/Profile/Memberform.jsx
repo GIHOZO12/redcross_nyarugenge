@@ -49,7 +49,7 @@ const RwandaRedCrossForm = () => {
 
   const fetchExistingData = async (userId) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/edit_general_information/${userId}/`, {
+      const response = await axios.get(`https://gihozo.pythonanywhere.com/api/edit_general_information/${userId}/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
@@ -102,7 +102,7 @@ const RwandaRedCrossForm = () => {
       if (existingData) {
         // Update existing data
         const response = await axios.put(
-          `http://127.0.0.1:8000/api/edit_general_information/${currentUser.id}/`,
+          `https://gihozo.pythonanywhere.com/api/edit_general_information/${currentUser.id}/`,
           {
             name: formData.names,
             nationalId: formData.nationalId,
@@ -141,7 +141,7 @@ const RwandaRedCrossForm = () => {
       } else {
         // Submit new data
         const response = await axios.post(
-          'http://127.0.0.1:8000/api/general_information/',
+          'https://gihozo.pythonanywhere.com/api/general_information/',
           {
             user: currentUser.id,
             name: formData.names,
@@ -203,7 +203,7 @@ const RwandaRedCrossForm = () => {
   const handleDownloadProof = async () => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/proof_of_registration/${currentUser.id}/`,
+        `https://gihozo.pythonanywhere.com/api/proof_of_registration/${currentUser.id}/`,
         {
           responseType: 'blob',
         }
@@ -401,6 +401,7 @@ const RwandaRedCrossForm = () => {
             >
               {existingData ? 'Update Your Information' : 'Send Your Information'}
             </button>
+            
           </div>
         </form>
       </section>

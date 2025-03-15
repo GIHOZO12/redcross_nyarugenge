@@ -19,7 +19,7 @@ const Join = () => {
         password,
       });
   
-      const { access, refresh, username, is_superuser, is_staff } = response.data;
+      const { access,role,refresh, username, is_superuser, is_staff } = response.data;
   
       // Store tokens in localStorage
       localStorage.setItem("access_token", access);
@@ -27,6 +27,8 @@ const Join = () => {
       localStorage.setItem("username", username);
       localStorage.setItem("is_superuser", is_superuser);
       localStorage.setItem("is_staff", is_staff);
+      localStorage.setItem("role", role); 
+      console.log("Role saved to local storage:", role);
   
       // Set refresh_token in cookies
       document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
@@ -40,6 +42,7 @@ const Join = () => {
         username: response.data.username,
         is_superuser: true,
         is_staff: true,
+        role: response.data.role,
       });
   
       // Hide login modal

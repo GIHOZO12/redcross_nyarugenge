@@ -232,7 +232,8 @@ class Createuserview(generics.CreateAPIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -240,14 +241,15 @@ class LoginView(APIView):
         try:
             user = User.objects.get(email=email)  # Find user by email
             user = authenticate(email=user.email, password=password)
-             
+
             if user:
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     "message": "Login successful",
                     "username": user.username,
-                    "is_superuser": user.is_superuser,  # Add this
-                    "is_staff": user.is_staff,  # Add this
+                    "role": user.role,
+                    "is_superuser": user.is_superuser,
+                    "is_staff": user.is_staff,
                     "access": str(refresh.access_token),
                     "refresh": str(refresh),
                 }, status=status.HTTP_200_OK)
