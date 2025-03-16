@@ -21,7 +21,7 @@ const ResetPassword = () => {
 
     try {
       // Simulate API call to reset password
-      const response = await fetch('http://127.0.0.1:8000/api/reset_password/', {
+      const response = await fetch('https://gihozo.pythonanywhere.com/api/reset_password/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
