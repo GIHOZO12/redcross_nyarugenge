@@ -388,12 +388,12 @@ def add_fellowship(request):
         image = request.FILES.get('fellowership_image')
 
         if not title or not description or not image:
-            return JsonResponse({'status': False, 'message': 'All fields are required'}, status=400)
+            return JsonResponse({'status': False, 'message': 'All fields are required',}, status=400)
 
         fellowship = Fellowership(title=title, description=description, fellowership_image=image)
         fellowship.save()
 
-        return JsonResponse({'status': True, 'message': 'Fellowship added successfully'}, status=201)
+        return JsonResponse({'status': True, 'message': 'Fellowship added successfully','redirect_url': '/admin/myfelowership'}, status=201)
 
     return JsonResponse({'status': False, 'message': 'Invalid request method'}, status=405)
 
