@@ -79,10 +79,25 @@ const Join = () => {
           password,
         }
       );
-
-      setMessage(response.data.message || "Registration successful!");
+  
+      // If registration is successful
+      setMessage("Registration successful! Please log in.");
+      setState("login"); // Switch to the login form after successful registration
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed");
+      // Handle specific error messages from the API
+      if (error.response) {
+        const { data } = error.response;
+  
+        if (data.username) {
+          setMessage("Username is already taken. Please choose a different one.");
+        } else if (data.email) {
+          setMessage("Email is already registered. Please use a different email.");
+        } else {
+          setMessage("Registration failed. Please try again.");
+        }
+      } else {
+        setMessage("Registration failed. Please check your connection and try again.");
+      }
     } finally {
       setLoading(false); // Stop loading
     }

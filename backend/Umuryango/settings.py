@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '172.31.201.93','gihozo.pythonanywher
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
 "admin_interface",
     "colorfield",  
@@ -214,3 +215,8 @@ AUTH_USER_MODEL = 'crouirouge.User'
 # logging.getLogger("django.server").addFilter(
 #     lambda record: "Broken pipe" not in record.getMessage()
 # )
+
+# JAZZMIN_UI_TWEAKS = {
+
+#     "theme": "darkly",
+# }
