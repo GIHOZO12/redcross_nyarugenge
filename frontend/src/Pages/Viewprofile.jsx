@@ -16,38 +16,32 @@ const Viewprofile = () => {
       };
     }
   };
-  const handleSubmit = async () => {
-    const token = localStorage.getItem('access_token');
-  
-    if (!changeprofilepicture.profile_image) {
-      console.error('No image selected');
-      return;
+ const handleSubmit = async () => {
+  const token = localStorage.getItem('access_token');
+  const formData = new FormData();
+  formData.append('profile_image', changeprofilepicture.profile_image);
+
+  try {
+    const response = await fetch('https://gihozo.pythonanywhere.com/api/change_profile_picture/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Profile picture updated successfully:', data);
+      setchangeprofilepicture(false);
+      fetchCurrentUser(); // Refresh the profile data
+    } else {
+      console.error('Failed to update profile picture');
     }
-  
-    const formData = new FormData();
-    formData.append('profile_pic', changeprofilepicture.profile_image);
-  
-    try {
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/change_profile_picture/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Profile picture updated successfully:', data);
-        setchangeprofilepicture(false);
-        fetchCurrentUser(); // Refresh the profile data
-      } else {
-        console.error('Failed to update profile picture');
-      }
-    } catch (error) {
-      console.error('Error updating profile picture:', error);
-    }
-  };
+  } catch (error) {
+    console.error('Error updating profile picture:', error);
+  }
+};
   const fetchCurrentUser = async () => {
     let token = localStorage.getItem('access_token');
 
