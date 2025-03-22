@@ -37,6 +37,7 @@ import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Payment from "./Components/Payment";
 import Update_activity from "./Pages/Update_activity";
+import Admin_general_info from "./Pages/Admin/Admin_courses";
 
 // Loading Spinner Component
 const Loadingspinner = () => (
@@ -98,7 +99,7 @@ const App = () => {
         <Route path="/admin/announcement" element={<Admin_announcement />} />
         <Route path="/edit_announcement/:id" element={<Edit_announcement />} />
         <Route path="/admin/addannouncement" element={<Add_anouncement />} />
-        <Route path="/admin/admin_courses" element={<Admin_courses />} />
+        <Route path="/admin/general" element={<Admin_general_info />} />
         <Route path="/admin/addactivity" element={<AdminAddActivities />} />
         <Route path="/admin/messages" element={<AdminMessage />} />
         <Route path="/subscibe_newslatter" element={<Subscribenewsletter/>}/>
