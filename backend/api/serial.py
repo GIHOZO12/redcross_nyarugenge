@@ -13,22 +13,35 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "username", "email", "role", "first_name", "last_name", "password", "profile_image"]
         extra_kwargs = {
-            "id": {"read_only": True, "required": False},     # Make email read-only
+            "id": {"read_only": True, "required": False},
             "password": {"write_only": True, "required": False},
             "role": {"read_only": True, "required": False},
-            "profile_image": {"read_only": True, "required": False},
-            "first_name": {"read_only": True,"required": False},
-            "last_name": {"read_only": True,"required": False},
+            "first_name": {"read_only": True, "required": False},
+            "last_name": {"read_only": True, "required": False},
+            # Remove "profile_image" from extra_kwargs to make it writable
         }
 
     def get_profile_image(self, obj):
         if obj.profile_image:  # Check if profile_image exists
             return self.context['request'].build_absolute_uri(obj.profile_image.url)
-        return None  # Return None if no image is setrn NOTE: This line is not needed, as we are not using it in the frontend.
+        return None  # Return None if no image is set
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        return user 
+        return user
+
+    def update(self, instance, validated_data):
+        # Handle profile image update
+        profile_image = validated_data.pop('profile_image', None)
+        if profile_image:
+            instance.profile_image = profile_image
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 class FamilySerializer(serializers.ModelSerializer):
       class Meta:

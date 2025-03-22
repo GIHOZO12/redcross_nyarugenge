@@ -308,19 +308,18 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"success": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-class ChangeProfilePicture(APIView):
+class ChangeProfilePictureView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        profile_pic = request.FILES.get('profile_pic')
-        
-        if profile_pic:
-            user.profile_pic = profile_pic
-            user.save()
-            return Response({"success": True, "message": "Profile picture updated successfully"})
+        serializer = UserSerializer(user, data=request.data, partial=True, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": True, "message": "Profile picture updated successfully", "data": serializer.data})
         else:
-            return Response({"success": False, "message": "No profile picture provided"}, status=400)
+            return Response({"success": False, "message": "Failed to update profile picture", "errors": serializer.errors}, status=400)
     
 
 
