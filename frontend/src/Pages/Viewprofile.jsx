@@ -116,9 +116,6 @@ const Viewprofile = () => {
                 <p className='text-center text-gray-600'>
                   <span>Email:</span> {Profile.email}
                 </p>
-                <p className='text-center text-gray-600'>
-                  <span>Role:</span> {Profile.role}
-                </p>
               </div>
             </div>
           )}
