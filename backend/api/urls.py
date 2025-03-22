@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import (  LoginView,ResetPasswordView, add_user_info, logout_view, user_list,family_list,announcement_list,
+from .views import (  LoginView,ResetPasswordView,Admin_all_generalinformation, add_user_info,  download_single_user_info, logout_view, user_list,family_list,announcement_list,
                     members_list,felloweship_list,redcrossactivities_list,current_user
                     ,first_id_course_list,Createuserview,GeneralInformation,ProofOfRegistrationView,EditGeneralInformation)
 
@@ -27,4 +27,6 @@ urlpatterns = [
     path('proof_of_registration/<int:user_id>/',ProofOfRegistrationView.as_view(),name='proof_of_registration'),
     path('edit_general_information/<int:user_id>/',EditGeneralInformation.as_view(),name='edit_general_information'),
     path('reset_password/',ResetPasswordView.as_view(),name='reset_password'),
+    path('admin_all_generalinformation/',Admin_all_generalinformation.as_view(),name='admin_all_generalinformation'),
+      path('download_single_user_info/<int:user_id>/', download_single_user_info, name='download_all_users_info'),
     ]

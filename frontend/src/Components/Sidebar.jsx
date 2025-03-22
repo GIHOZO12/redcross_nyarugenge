@@ -63,12 +63,14 @@ const Sidebar = () => {
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
             <li>
-              <Link to="/admin/admin_courses" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaFirstAid/>First Aid Courses</Link>
+            <Link to="/admin/general" className="block p-3 rounded hover:bg-blue-700">All info</Link>
+
             </li>
             <li>
               <Link to="/admin/messages" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>Messages<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allmessage}</span></Link>
             </li>
             <li>
+              
               <Link to="/admin/announcement" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaBullhorn/>Announcements</Link>
             </li>
 
@@ -118,7 +120,7 @@ const Sidebar = () => {
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/admin_courses" className="block p-3 rounded hover:bg-blue-700">First Aid Courses</Link>
+              <Link to="/admin/general" className="block p-3 rounded hover:bg-blue-700">all info</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
                             <Link to="/admin/messages" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>Messages<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allmessage}</span></Link>
