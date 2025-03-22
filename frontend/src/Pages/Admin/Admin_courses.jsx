@@ -7,7 +7,7 @@ const Admin_general_info = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('access_token'); // Retrieve the token from local storage
-        axios.get("http://127.0.0.1:8000/api/admin_all_generalinformation/", {
+        axios.get("https://gihozo.pythonanywhere.com/api/admin_all_generalinformation/", {
             headers: {
                 'Authorization': `Bearer ${token}` // Include the token in the request headers
             }
@@ -22,7 +22,7 @@ const Admin_general_info = () => {
 
     const handleDownloadSingleUserInfo = (userId) => {
         const token = localStorage.getItem('access_token');
-        axios.get(`http://127.0.0.1:8000/api/download_single_user_info/${userId}/`, {
+        axios.get(`https://gihozo.pythonanywhere.com/api/download_single_user_info/${userId}/`, {
             responseType: 'blob',
             headers: {
                 'Authorization': `Bearer ${token}`
