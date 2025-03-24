@@ -37,7 +37,7 @@ const AdminFamily = () => {
                     
                     <td className="px-4 py-2">{item.father}</td>
                     <td className="px-4 py-2">{item.mother}</td>
-                    <td className="px-4 py-2">{item.member}0</td>
+                    <td className="px-4 py-2">{item.number_of_members}</td>
                    
                    
     
