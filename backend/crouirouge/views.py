@@ -19,7 +19,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from urllib.parse import urljoin
 
-from crouirouge.models import (Family, Members, User,
+from crouirouge.models import (Family,Members, User,
                                FamilyActivities,Fellowership,
                                RedcrossActivities,
                                FirstAidCourse,Instructors,
@@ -612,6 +612,7 @@ def admin_family(request):
             "name": fam.name,
             "father": fam.father.username if fam.father else "Not Assigned",
             "mother": fam.mother.username if fam.mother else "Not Assigned",
+            "number_of_members": fam.family.count(),
         })
                 
     return JsonResponse(data, safe=False)
