@@ -87,7 +87,7 @@ const Viewprofile = () => {
       <div className='flex pt-16'>
         <div className='w-full max-w-md bg-white rounded-lg p-5 shadow-lg'>
           {Profile && (
-            <div className='flex justify-between items-center'>
+            <div className='flex flex-col sm:flex-row justify-between items-center'>
           <div>
           <img
                 src={Profile.profile_image ? `https://gihozo.pythonanywhere.com/${Profile.profile_image}` : '../assets/logo.png'}
