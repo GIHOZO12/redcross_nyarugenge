@@ -127,6 +127,7 @@ const Viewprofile = () => {
       &&(
       <User_info/> 
     )}
+    <User_info/> 
     
     </div>
   );
