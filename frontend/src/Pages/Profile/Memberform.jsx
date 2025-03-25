@@ -22,6 +22,7 @@ const RwandaRedCrossForm = () => {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [existingData, setExistingData] = useState(null);
+  const [nationalIdError, setNationalIdError] = useState(''); // State for national ID error
 
   const fetchCurrentUser = async () => {
     let token = localStorage.getItem('access_token');
@@ -89,6 +90,21 @@ const RwandaRedCrossForm = () => {
       ...formData,
       [name]: updatedValue,
     });
+
+    // Clear error when user types in the national ID field
+    if (name === 'nationalId') {
+      setNationalIdError('');
+    }
+  };
+
+  const checkNationalIdExists = async (nationalId) => {
+    try {
+      const response = await axios.get(`https://gihozo.pythonanywhere.com/api/check_national_id/?nationalId=${nationalId}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking national ID:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -96,6 +112,21 @@ const RwandaRedCrossForm = () => {
     if (!currentUser) {
       console.error('Current user not available');
       return;
+    }
+
+    // Check if national ID exists (only for new submissions, not updates)
+    if (!existingData) {
+      const idExists = await checkNationalIdExists(formData.nationalId);
+      if (idExists) {
+        setNationalIdError('This national ID is already registered in our system.');
+        Swal.fire({
+          title: 'Error!',
+          text: 'This national ID is already registered in our system.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
     }
 
     try {
@@ -182,6 +213,23 @@ const RwandaRedCrossForm = () => {
       }
     } catch (error) {
       console.error('Error submitting form:', error.response?.data || error.message);
+      // Check if the error is about duplicate national ID
+      if (error.response?.data?.nationalId) {
+        setNationalIdError(error.response.data.nationalId[0]);
+        Swal.fire({
+          title: 'Error!',
+          text: error.response.data.nationalId[0],
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      } else {
+        Swal.fire({
+          title: 'Error!',
+          text: 'An error occurred while submitting the form. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
     }
   };
 
@@ -251,9 +299,12 @@ const RwandaRedCrossForm = () => {
                   name='nationalId'
                   value={formData.nationalId}
                   onChange={handleChange}
-                  className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500'
+                  className={`w-full px-4 py-2 border ${nationalIdError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500`}
                   placeholder='Enter NID or Passport number'
                 />
+                {nationalIdError && (
+                  <p className="mt-1 text-sm text-red-600">{nationalIdError}</p>
+                )}
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>Gender</label>
@@ -395,21 +446,21 @@ const RwandaRedCrossForm = () => {
           </div>
 
           <div className='text-center flex flex-col md:flex-row justify-between gap-4'>
-  <button
-    type='submit'
-    className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
-  >
-    {existingData ? 'Update Your Information' : 'Send Your Information'}
-  </button>
-  {existingData && ( // Show the button only if existingData is truthy
-    <button
-      onClick={handleDownloadProof} // Call handleDownloadProof when clicked
-      className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
-    >
-      Download Proof of Registration
-    </button>
-  )}
-</div>
+            <button
+              type='submit'
+              className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
+            >
+              {existingData ? 'Update Your Information' : 'Send Your Information'}
+            </button>
+            {existingData && ( // Show the button only if existingData is truthy
+              <button
+                onClick={handleDownloadProof} // Call handleDownloadProof when clicked
+                className='bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500'
+              >
+                Download Proof of Registration
+              </button>
+            )}
+          </div>
         </form>
       </section>
     </div>
