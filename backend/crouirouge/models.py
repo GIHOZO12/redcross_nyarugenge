@@ -6,6 +6,7 @@ from django.db import models
 role=[
     ('Father','Father'),
     ('Mother','Mother'),
+    ('Member','Member'),
     ('President','President'),
     ('Vice President','Vice President'),
     ('admin','admin'),

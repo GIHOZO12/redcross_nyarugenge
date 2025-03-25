@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { refreshToken, isTokenExpired } from '../Components/auth';  // Import the utility functions
 import User_info from './Profile/User_info';
+import { AppContext } from '../AppContext/Appcontext';
 
 const Viewprofile = () => {
   const [Profile, setProfile] = useState(null);
   const [changeprofilepicture, setchangeprofilepicture]=useState(false)
+  const {user} =useContext(AppContext);
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -121,7 +123,11 @@ const Viewprofile = () => {
           )}
         </div>
       </div>
+      {user.is_authenticated && (user.role === "Member" || user.role === "staff" || user.role === "superuser")
+      &&(
       <User_info/> 
+    )}
+    
     </div>
   );
 };
