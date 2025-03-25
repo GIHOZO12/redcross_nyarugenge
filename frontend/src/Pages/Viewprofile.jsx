@@ -123,11 +123,10 @@ const Viewprofile = () => {
           )}
         </div>
       </div>
-      {user.is_authenticated && (user.role === "Member" || user.role === "staff" || user.role === "superuser")
-      &&(
-      <User_info/> 
-    )}
-    <User_info/> 
+      {user.is_authenticated && (user.role === "Member" || user.role === "admin" || user.is_superuser) && (
+  <User_info/> 
+)}
+    
     
     </div>
   );
