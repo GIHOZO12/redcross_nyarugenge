@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from crouirouge.models import  (User,Family,Announcement
                                 ,Members,Fellowership,
-                                RedcrossActivities,
+                                RedcrossActivities,RequestMembership,
                                 FirstAidCourse,Address,Generalinformation,BloodDonation)
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,6 +42,26 @@ class UserSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class RequestMembershipSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+
+    class Meta:
+        model = RequestMembership
+        fields = ['id', 'user', 'username', 'email', 'message', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['user', 'status', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        # Automatically set the user to the current user
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)    
 
 class FamilySerializer(serializers.ModelSerializer):
       class Meta:

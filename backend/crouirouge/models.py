@@ -29,6 +29,32 @@ class User(AbstractUser):
          verbose_name_plural = "Users"
     def __str__(self):
         return self.username
+    
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class RequestMembership(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='membership_requests')
+    message = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Membership request from {self.user.username} - {self.status}"
+
+    class Meta:
+        ordering = ['-created_at']
+
+         
 blood_donated=[
         ('yes','yes'),
         ('no','no')

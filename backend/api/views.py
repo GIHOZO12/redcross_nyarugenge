@@ -16,7 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
-from rest_framework import generics
+from rest_framework import generics,permissions
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.utils.decorators import method_decorator
@@ -32,16 +32,55 @@ from django.views.decorators.csrf import csrf_exempt,csrf_protect,ensure_csrf_co
 from django.shortcuts import get_object_or_404
 from crouirouge.models import (User,Family,Announcement,Members,
                                Fellowership,
-                               RedcrossActivities,
+                               RedcrossActivities,RequestMembership,
                                FirstAidCourse,Address,BloodDonation,Generalinformation,)
 from .serial import (UserSerializer,FamilySerializer,
                      AnnouncementSerializer,MembersSerializer,
-                     Felloweshipserializer,
+                     Felloweshipserializer,RequestMembershipSerializer,
                      Redcrossactivitiesserializer,
                      FirstAidCourseSerializer,GeneralinformationSerializer)
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView 
 from rest_framework_simplejwt.tokens import RefreshToken 
 from .serial import LoginSerializer
+
+
+
+
+
+class RequestMembershipView(generics.CreateAPIView):
+    queryset = RequestMembership.objects.all()
+    serializer_class = RequestMembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Check if user already has a pending request
+        if RequestMembership.objects.filter(user=request.user, status='pending').exists():
+            return Response(
+                {'detail': 'You already have a pending membership request.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if user is already a member
+        if request.user.role in ['Member', 'admin']:
+            return Response(
+                {'detail': 'You are already a member.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {'detail': 'Membership request submitted successfully.'},
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+
+
+
+
 
 @api_view(['GET','POST'])
 def user_list(request):
