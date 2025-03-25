@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
 from .models import (
-    User, Family, Announcement, Members, FamilyActivities, 
+    RequestMembership, User, Family, Announcement, Members, FamilyActivities, 
     Fellowership, RedcrossActivities, FirstAidCourse, 
     Instructors, RedcrossLeader,Messages,
     SubscribeNewslatter,Address,Generalinformation,BloodDonation
@@ -14,6 +14,28 @@ admin.site.site_url = settings.SITE_URL
        
  
 
+@admin.register(RequestMembership)
+class RequestMembershipAdmin(admin.ModelAdmin):
+    list_display = ('user', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username', 'user__email', 'message')
+    actions = ['approve_requests', 'reject_requests']
+
+    def approve_requests(self, request, queryset):
+        for req in queryset:
+            req.status = 'approved'
+            req.save()
+            # Optionally update user role here
+            req.user.role = 'Member'
+            req.user.save()
+        self.message_user(request, f"{queryset.count()} requests approved.")
+
+    def reject_requests(self, request, queryset):
+        queryset.update(status='rejected')
+        self.message_user(request, f"{queryset.count()} requests rejected.")
+
+    approve_requests.short_description = "Approve selected requests"
+    reject_requests.short_description = "Reject selected requests"
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
