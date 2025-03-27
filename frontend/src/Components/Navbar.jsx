@@ -13,7 +13,9 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { setshowlogin, user = {}, setUser } = useContext(AppContext);
   const { setshowpayment } = useContext(AppContext);
-  const [profileImage, setProfileImage] = useState(null); // State to store profile image
+  const [profileImage, setProfileImage] = useState(null);
+  
+   // State to store profile image
 
   // Fetch current user data
   const fetchCurrentUser = async () => {
