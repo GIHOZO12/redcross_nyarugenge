@@ -136,6 +136,7 @@ class BloodDonationSerializer(serializers.ModelSerializer):
 class GeneralinformationSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     blood_donated = BloodDonationSerializer()
+    username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = Generalinformation
