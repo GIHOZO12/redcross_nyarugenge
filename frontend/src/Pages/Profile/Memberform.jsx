@@ -169,6 +169,21 @@ const RwandaRedCrossForm = () => {
             handleDownloadProof();
           }
         });
+        setFormData({
+          names: '',
+          nationalId: '',
+          gender: 'Male',
+          department: '',
+          email: '',
+          regno: '',
+          province: '',
+          district: '',
+          sector: '',
+          cell: '',
+          village: '',
+          donated: 'Yes',
+          donated_times: 0,
+        });
       } else {
         // Submit new data
         const response = await axios.post(

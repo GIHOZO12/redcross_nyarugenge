@@ -216,6 +216,7 @@ class Messages(models.Model):
 class SubscribeNewslatter(models.Model):
      email=models.EmailField()
      created_at=models.DateTimeField(auto_now_add=True)
+     is_active = models.BooleanField(default=True) 
      class Meta:
           verbose_name="Subscribe Newslatter"
           verbose_name_plural = "Subscribe Newslatters"

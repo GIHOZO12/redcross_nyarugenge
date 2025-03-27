@@ -54,6 +54,7 @@ urlpatterns = [
      path("all_messages/",views.all_messages,name="all_messages"),
      path("all_subscribes/",views.subscribe_newsletter,name="subscribe_newsletter"),
      path("add_email_toseubscribenewsletter/",views.add_email_toseubscribenewsletter,name="add_email_toseubscribenewsletter"),
+    path('send_newsletter/', views.send_newsletter, name='send_newsletter'),
    
 
     ]

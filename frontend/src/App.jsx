@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react"; 
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
@@ -39,6 +39,7 @@ import Payment from "./Components/Payment";
 import Update_activity from "./Pages/Update_activity";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
 import Confirmmbership from "./Pages/Admin/Confirmmbership";
+import NotFound from "./Pages/Note_found";
 
 // Loading Spinner Component
 const Loadingspinner = () => (
@@ -52,7 +53,7 @@ const Loadingspinner = () => (
 
 const App = () => {
   const { showlogin } = useContext(AppContext);
-  const {showpayment}=useContext(AppContext);
+  const { showpayment } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -99,12 +100,12 @@ const App = () => {
         <Route path="/admin/redcrossfamilies" element={<AdminFamily />} />
         <Route path="/admin/announcement" element={<Admin_announcement />} />
         <Route path="/edit_announcement/:id" element={<Edit_announcement />} />
-        <Route path="confirm_membership" element={<Confirmmbership/>}/>
+        <Route path="confirm_membership" element={<Confirmmbership />} />
         <Route path="/admin/addannouncement" element={<Add_anouncement />} />
         <Route path="/admin/general" element={<Admin_general_info />} />
         <Route path="/admin/addactivity" element={<AdminAddActivities />} />
         <Route path="/admin/messages" element={<AdminMessage />} />
-        <Route path="/subscibe_newslatter" element={<Subscribenewsletter/>}/>
+        <Route path="/subscibe_newslatter" element={<Subscribenewsletter />} />
 
         {/* Non-Admin Routes */}
         <Route
@@ -113,13 +114,13 @@ const App = () => {
             <>
               <Navbar />
               {showlogin && <Join />}
-              {showpayment && <Payment/>}
+              {showpayment && <Payment />}
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/update" element={<Anouncement />} />
                 <Route path="/ideas" element={<Ideas />} />
                 <Route path="/Viewprofile" element={<Viewprofile />} />
-                <Route path="/payment" element={<Payment/>}/>
+                <Route path="/payment" element={<Payment />} />
                 
                 <Route path="/Courses" element={<Firstaidcourses />} />
                 <Route path="/families/unit" element={<UnitFamily />} />
@@ -129,11 +130,11 @@ const App = () => {
                 <Route path="/event/fellowership" element={<All_fellowership />} />
                 <Route path="/event/allactivities" element={<All_Activities />} />
                 <Route path="/families/universality" element={<Universality />} />
-                
 
                 <Route path="/addactivities/:familyName" element={<Activitiesadd />} />
-                <Route path="/update_activity/:id" element={<Update_activity/>}/>
+                <Route path="/update_activity/:id" element={<Update_activity />} />
                 <Route path="/course/first-aid-courses/:id" element={<FirstAidDetails />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
               <Getintouch />
               <Footer />

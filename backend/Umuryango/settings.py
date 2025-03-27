@@ -82,7 +82,9 @@ ROOT_URLCONF = 'Umuryango.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-          'DIRS': [],
+          'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),  # Add the 'templates' directory if not already present
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -226,3 +228,15 @@ AUTH_USER_MODEL = 'crouirouge.User'
 
 #     "theme": "darkly",
 # }
+
+
+
+# settings.py
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ismailgihozo@gmail.com'
+EMAIL_HOST_PASSWORD = 'wvra debr ysik adnh'  # Consider using environment variables
+DEFAULT_FROM_EMAIL = 'ismailgihozo@gmail.com'

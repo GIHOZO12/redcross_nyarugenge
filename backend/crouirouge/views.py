@@ -1,6 +1,10 @@
 from ast import Subscript
+from email.message import EmailMessage
 import json
+from django.utils.html import strip_tags
 import logging
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -353,6 +357,47 @@ def users_info(request):
 
    
     return JsonResponse(data, safe=False)
+
+
+
+from django.core.mail import EmailMultiAlternatives
+@csrf_exempt
+def send_newsletter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            subject = data.get('subject', 'Newsletter Update')
+            html_content = data.get('html_content', '')
+            plain_content = data.get('plain_content', strip_tags(html_content))
+            
+            subscribers = SubscribeNewslatter.objects.all()
+            
+            for subscriber in subscribers:
+                # Create email with EmailMultiAlternatives
+                email = EmailMultiAlternatives(
+                    subject,
+                    plain_content,
+                    None,  # Uses DEFAULT_FROM_EMAIL
+                    [subscriber.email]
+                )
+                email.attach_alternative(html_content, "text/html")
+                email.send()
+            
+            return JsonResponse({
+                'status': 'success', 
+                'message': f'Newsletter sent to {subscribers.count()} subscribers'
+            })
+        
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error', 
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'status': 'error', 
+        'message': 'Invalid request method'
+    }, status=400)
 
 
 

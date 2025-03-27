@@ -161,9 +161,20 @@ class GeneralinformationSerializer(serializers.ModelSerializer):
         )
         return general_information_obj
     def update(self, instance, validated_data):
-        # Update address
+        
         address_data = validated_data.pop('address', None)
         if address_data:
             for attr, value in address_data.items():
                 setattr(instance.address, attr, value)
             instance.address.save()
+
+       
+        blood_donated_data = validated_data.pop('blood_donated', None)
+        if blood_donated_data:
+            for attr, value in blood_donated_data.items():
+                setattr(instance.blood_donated, attr, value)
+            instance.blood_donated.save()
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance  

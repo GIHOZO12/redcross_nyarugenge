@@ -246,7 +246,7 @@ const Viewprofile = () => {
                   }}
                   required
                   minLength="20"
-                  placeholder="Please explain why you want to join"
+                 
                 />
               </div>
               <div className="flex justify-end space-x-2">
