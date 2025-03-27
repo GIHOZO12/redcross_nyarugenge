@@ -53,63 +53,47 @@ const Viewprofile = () => {
   };
 
   const handleRequestSubmit = async (e) => {
-    // Debug: Confirm function is called
-    console.log("handleRequestSubmit triggered");
-    
-    // Prevent default form submission
     e.preventDefault();
-    console.log("Default prevented");
+    console.log("Submit request button clicked"); // Debugging step 1
 
     const token = localStorage.getItem('access_token');
-    console.log("Token exists:", !!token);
-    
     if (!token) {
-      console.error("No token found");
-      alert('Please log in first');
-      return;
+        alert('Please log in first');
+        return;
     }
 
     try {
-      console.log("Attempting to submit request...");
-      setRequestStatus('loading');
-      
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/request_membership/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: requestMessage,
-          user_id: user.id 
-        }),
-      });
+        setRequestStatus('loading');
+        console.log("Sending request with message:", requestMessage); // Debugging step 2
 
-      console.log("Response status:", response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Server error:", errorData);
-        throw new Error(errorData.detail || 'Request failed');
-      }
+        const response = await fetch('https://gihozo.pythonanywhere.com/api/request_membership/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: requestMessage }),
+        });
 
-      const data = await response.json();
-      console.log("Request successful:", data);
-      
-      setRequestStatus('success');
-      setShowRequestForm(false);
-      setRequestMessage('');
-      
+        const data = await response.json();
+        console.log("API Response:", data); // Debugging step 3
+
+        if (!response.ok) {
+            throw new Error(data.detail || 'Request failed');
+        }
+
+        setRequestStatus('success');
+        setShowRequestForm(false);
+        setRequestMessage('');
+        fetchCurrentUser();
+        
     } catch (error) {
-      console.error("Full error:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-      setRequestStatus('error');
-      alert(`Error: ${error.message}`);
+        console.error('Request failed:', error);
+        setRequestStatus('error');
+        alert(`Error: ${error.message}`);
     }
-  };
+};
+
 
   const fetchCurrentUser = async () => {
     let token = localStorage.getItem('access_token');
@@ -199,7 +183,6 @@ const Viewprofile = () => {
                   <span>Email:</span> {Profile.email}
                 </p>
                 <p className='text-center text-gray-600'>
-                  <span>Role:</span> {Profile.role}
                 </p>
               </div>
             </div>
@@ -236,10 +219,7 @@ const Viewprofile = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Membership Request</h2>
-            <form onSubmit={(e) => {
-              console.log("Form submit event");
-              handleRequestSubmit(e);
-            }}>
+            <form onSubmit={handleRequestSubmit}>
               <div className="mb-3">
                 <label className="block text-gray-700 mb-2" htmlFor="name">Your name</label>
                 <input
@@ -252,20 +232,21 @@ const Viewprofile = () => {
               </div> 
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2" htmlFor="message">
-                  Why do you want to become a member?
+                  Why do you want to become a member? at least 5 characters
                 </label>
                 <textarea
                   id="message"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   rows="4"
+                  placeholder="Please explain why you want to join in at least 5 characters"
                   value={requestMessage}
                   onChange={(e) => {
-                    console.log("Message changed:", e.target.value);
+                    
                     setRequestMessage(e.target.value);
                   }}
                   required
                   minLength="20"
-                  placeholder="Please explain why you want to join (minimum 20 characters)"
+                  placeholder="Please explain why you want to join"
                 />
               </div>
               <div className="flex justify-end space-x-2">
@@ -273,7 +254,6 @@ const Viewprofile = () => {
                   type="button"
                   className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
                   onClick={() => {
-                    console.log("Cancel button clicked");
                     setShowRequestForm(false);
                     setRequestMessage('');
                   }}
@@ -283,7 +263,7 @@ const Viewprofile = () => {
                 <button
                   type="submit"
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center"
-                  disabled={requestMessage.length < 20 || requestStatus === 'loading'}
+                  disabled={requestMessage.length < 5 || requestStatus === 'loading'}
                 >
                   {requestStatus === 'loading' ? (
                     <>
