@@ -91,7 +91,7 @@ const Subscribenewsletter = () => {
 
     useEffect(() => {
         // Fetch the list of subscribers
-        axios.get("http://127.0.0.1:8000/all_subscribes/")
+        axios.get("https://gihozo.pythonanywhere.com/all_subscribes/")
             .then((res) => {
                 setSubscriptions(res.data);
             })
@@ -105,7 +105,7 @@ const Subscribenewsletter = () => {
         
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/send_newsletter/",
+                "https://gihozo.pythonanywhere.com/send_newsletter/",
                 {
                     subject,
                     html_content: htmlContent,
