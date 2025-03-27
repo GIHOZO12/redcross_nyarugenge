@@ -13,6 +13,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [allmessage,setAllMessage]=useState()
   const [newlatter,setNewltter]=useState()
+  const [allrequsted,setAllrequested]=useState()
 
   useEffect(()=>{
     axios.get("https://gihozo.pythonanywhere.com/all_messages/")
@@ -31,6 +32,27 @@ const Sidebar = () => {
       console.error("error fetching data",error)
     })
   })
+
+  useEffect(() => {
+    const fetchRequestedMemberships = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(
+          "https://gihozo.pythonanywhere.com/api/total_requested_memberships/", 
+          {
+            headers: { 
+              'Authorization': `Bearer ${token}` 
+            }
+          }
+        );
+        setAllrequested(response.data.total_requests);
+      } catch (error) {
+        console.error("Error fetching requested memberships:", error);
+      }
+    };
+  
+    fetchRequestedMemberships();
+  }, []);
 
   return (
     <>
@@ -67,7 +89,7 @@ const Sidebar = () => {
 
             </li>
             <li>
-            <Link to="/confirm_membership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>All requested membership</Link>
+            <Link to="/confirm_membership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>All requested membership<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allrequsted}</span></Link>
 
             </li>
             <li>

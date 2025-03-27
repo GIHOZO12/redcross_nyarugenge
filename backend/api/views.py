@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from reportlab.lib.pagesizes import letter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
@@ -123,7 +124,18 @@ class ApproveRequestMembership(APIView):
             return Response(
                 {'message': 'Request does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
+            
+            
             )
+        
+class Totalrequestedmemberships(APIView):
+    authentication_classes = [JWTAuthentication]  # Add JWT authentication
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        total_requests = RequestMembership.objects.filter(status='pending').count()
+        return Response({'total_requests': total_requests}, status=status.HTTP_200_OK)
+    
+        
 @api_view(['GET','POST'])
 def user_list(request):
     if request.method == 'GET':
