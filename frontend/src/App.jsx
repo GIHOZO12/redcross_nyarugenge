@@ -38,6 +38,7 @@ import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Payment from "./Components/Payment";
 import Update_activity from "./Pages/Update_activity";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
+import Confirmmbership from "./Pages/Admin/Confirmmbership";
 
 // Loading Spinner Component
 const Loadingspinner = () => (
@@ -98,6 +99,7 @@ const App = () => {
         <Route path="/admin/redcrossfamilies" element={<AdminFamily />} />
         <Route path="/admin/announcement" element={<Admin_announcement />} />
         <Route path="/edit_announcement/:id" element={<Edit_announcement />} />
+        <Route path="confirm_membership" element={<Confirmmbership/>}/>
         <Route path="/admin/addannouncement" element={<Add_anouncement />} />
         <Route path="/admin/general" element={<Admin_general_info />} />
         <Route path="/admin/addactivity" element={<AdminAddActivities />} />
