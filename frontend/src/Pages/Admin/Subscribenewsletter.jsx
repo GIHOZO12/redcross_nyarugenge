@@ -1,9 +1,11 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../Layout/AdminLayout';
 import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css';
 
+// eslint-disable-next-line react/prop-types
 const NewsletterComposer = ({ onClose, onSend }) => {
     const [subject, setSubject] = useState('');
     const { quill, quillRef } = useQuill();
