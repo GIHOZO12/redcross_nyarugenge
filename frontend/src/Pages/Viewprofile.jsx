@@ -66,7 +66,7 @@ const Viewprofile = () => {
         setRequestStatus('loading');
         console.log("Sending request with message:", requestMessage); // Debugging step 2
 
-        const response = await fetch('https://gihozo.pythonanywhere.com/api/request_membership/', {
+        const response = await fetch('http://127.0.0.1:8000/api/request_membership/', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

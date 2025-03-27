@@ -79,19 +79,51 @@ class RequestMembershipView(generics.CreateAPIView):
 
 
 
-class AllrequestedMemberships(generics.ListAPIView):
+class Allrequestedmemberships(generics.ListAPIView):
     queryset = RequestMembership.objects.all()
     serializer_class = RequestMembershipSerializer
     permission_classes = [permissions.IsAuthenticated]
-    def list(self, request, *args, **kwargs):
-        queryset = RequestMembership.objects.filter(status='pending')
-        serializer = RequestMembershipSerializer(queryset, many=True)
-        return Response(serializer.data)
-    class ApproveMembershipRequest(generics.UpdateAPIView):
-        queryset = RequestMembership.objects.all()
-        serializer_class = RequestMembershipSerializer
-        permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        return RequestMembership.objects.filter(status='pending')
+class ApproveRequestMembership(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request, pk):
+        try:
+            request_obj = RequestMembership.objects.get(pk=pk)
+            
+            if request_obj.status != 'pending':
+                return Response(
+                    {'message': 'Request has already been processed.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Update request status
+            request_obj.status = 'approved'
+            request_obj.save()
+            
+            # Update user role
+            user = request_obj.user
+            user.role = 'Member'
+            user.save()
+            
+            return Response(
+                {
+                    'message': 'Request approved successfully.',
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'new_role': user.role
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+            
+        except ObjectDoesNotExist:
+            return Response(
+                {'message': 'Request does not exist.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 @api_view(['GET','POST'])
 def user_list(request):
     if request.method == 'GET':

@@ -67,6 +67,10 @@ const Sidebar = () => {
 
             </li>
             <li>
+            <Link to="/confirm_membership" className="block p-3 rounded hover:bg-blue-700">All requested membership</Link>
+
+            </li>
+            <li>
               <Link to="/admin/messages" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>Messages<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allmessage}</span></Link>
             </li>
             <li>
