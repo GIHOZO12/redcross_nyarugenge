@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBars, FaEnvelope, FaTachometerAlt, FaTimes, FaUserAlt } from "react-icons/fa";
+import { FaAllergies, FaBars, FaEnvelope, FaTachometerAlt, FaTimes, FaUserAlt } from "react-icons/fa";
 import axios from "axios";
 import { MdDashboard } from "react-icons/md";
 import { MdFamilyRestroom } from "react-icons/md";
@@ -63,11 +63,11 @@ const Sidebar = () => {
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
             <li>
-            <Link to="/admin/general" className="block p-3 rounded hover:bg-blue-700">All info</Link>
+            <Link to="/admin/general" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>All info</Link>
 
             </li>
             <li>
-            <Link to="/confirm_membership" className="block p-3 rounded hover:bg-blue-700">All requested membership</Link>
+            <Link to="/confirm_membership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>All requested membership</Link>
 
             </li>
             <li>
@@ -112,10 +112,10 @@ const Sidebar = () => {
               <Link to="/admin" className="block p-3 rounded hover:bg-blue-700">Dashboard</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/redcrossfamilies" className="block p-3 rounded hover:bg-blue-700">Families</Link>
+              <Link to="/admin/redcrossfamilies" className="block p-3 rounded hover:bg-blue-700"><MdFamilyRestroom/>Families</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/adminusers" className="block p-3 rounded hover:bg-blue-700">Users</Link>
+              <Link to="/admin/adminusers" className="block p-3 rounded hover:bg-blue-700">  <FaUserAlt />Users</Link>
             </li>
             {/* <li onClick={() => setIsOpen(false)}>
               <Link to="/admin/Redscrossactivies" className="block p-3 rounded hover:bg-blue-700">Activities</Link>
@@ -124,13 +124,17 @@ const Sidebar = () => {
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/general" className="block p-3 rounded hover:bg-blue-700">all info</Link>
+              <Link to="/admin/general" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>all info</Link>
+            </li>
+            <li onClick={() => setIsOpen(false)}  >
+            <Link to="/confirm_membership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>All requested membership</Link>
+
             </li>
             <li onClick={() => setIsOpen(false)}>
                             <Link to="/admin/messages" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaEnvelope/>Messages<span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold">{allmessage}</span></Link>
             </li>
             <li onClick={() => setIsOpen(false)}>
-              <Link to="/admin/announcement" className="block p-3 rounded hover:bg-blue-700">Announcements</Link>
+              <Link to="/admin/announcement" className="block p-3 rounded hover:bg-blue-700"><FaBullhorn/>Announcements</Link>
             </li>
 
             <li>

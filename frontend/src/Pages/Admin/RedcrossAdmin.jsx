@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const RedcrossAdmin = () => {
   const [data, setData] = useState({ family: 0, member: 0, activities: 0 });
@@ -19,7 +20,8 @@ const RedcrossAdmin = () => {
     <AdminLayout>
       <div className="p-6 bg-white rounded-lg shadow-md">
         <h1 className="text-3xl font-bold text-blue-900">Welcome to UR Nyarugenge Red Cross Admin Dashboard</h1>
-        <p className="mt-4 text-gray-700">Manage users, activities, and more from here.</p>
+      <div className='flex flex-row gap-4 items-center p-4'>  <p className="mt-4 text-gray-700">Manage users, activities, and more from here.</p>
+      <button> <Link to="/" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Go to Site</Link></button></div>
       </div>
       <div className="mt-6 p-4 bg-gray-100 rounded-lg shadow flex flex-row gap-14">
        
