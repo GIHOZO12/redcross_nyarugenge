@@ -178,3 +178,15 @@ class GeneralinformationSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance  
+
+
+from django.utils.html import strip_tags
+class NewsletterSerializer(serializers.Serializer):
+    subject = serializers.CharField(default="Newsletter Update")
+    html_content = serializers.CharField()
+    plain_content = serializers.CharField(required=False)
+    
+    def validate(self, data):
+        if 'plain_content' not in data:
+            data['plain_content'] = strip_tags(data['html_content'])
+        return data

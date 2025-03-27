@@ -31,11 +31,11 @@ from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt,csrf_protect,ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
-from crouirouge.models import (User,Family,Announcement,Members,
+from crouirouge.models import (SubscribeNewslatter, User,Family,Announcement,Members,
                                Fellowership,
                                RedcrossActivities,RequestMembership,
                                FirstAidCourse,Address,BloodDonation,Generalinformation,)
-from .serial import (UserSerializer,FamilySerializer,
+from .serial import (NewsletterSerializer, UserSerializer,FamilySerializer,
                      AnnouncementSerializer,MembersSerializer,
                      Felloweshipserializer,RequestMembershipSerializer,
                      Redcrossactivitiesserializer,
@@ -571,3 +571,46 @@ def download_single_user_info(request, user_id):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="user_{user.id}_info.pdf"'
     return response
+
+
+
+
+
+
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
+
+class SendNewsletterView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = NewsletterSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(
+                {'status': 'error', 'message': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            data = serializer.validated_data
+            subscribers = SubscribeNewslatter.objects.all()
+            
+            for subscriber in subscribers:
+                email = EmailMultiAlternatives(
+                    data['subject'],
+                    data['plain_content'],
+                    None,  # Uses DEFAULT_FROM_EMAIL
+                    [subscriber.email]
+                )
+                email.attach_alternative(data['html_content'], "text/html")
+                email.send()
+            
+            return Response({
+                'status': 'success',
+                'message': f'Newsletter sent to {subscribers.count()} subscribers'
+            })
+            
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

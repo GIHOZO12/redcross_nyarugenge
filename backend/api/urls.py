@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import ( Allrequestedmemberships, ApproveRequestMembership, ChangeProfilePictureView, LoginView, RequestMembershipView,ResetPasswordView,Admin_all_generalinformation, Totalrequestedmemberships, add_user_info,  download_single_user_info, logout_view, user_list,family_list,announcement_list,
+from .views import ( Allrequestedmemberships, ApproveRequestMembership, ChangeProfilePictureView, LoginView, RequestMembershipView,ResetPasswordView,Admin_all_generalinformation, SendNewsletterView, Totalrequestedmemberships, add_user_info,  download_single_user_info, logout_view, user_list,family_list,announcement_list,
                     members_list,felloweship_list,redcrossactivities_list,current_user
                     ,first_id_course_list,Createuserview,GeneralInformation,ProofOfRegistrationView,EditGeneralInformation)
 
@@ -33,5 +33,6 @@ urlpatterns = [
       path('request_membership/', RequestMembershipView.as_view(), name='request-membership'),
       path('all_requested_memberships/',Allrequestedmemberships.as_view(),name='all_requested_memberships' ),
       path("approve_request_membership/<int:pk>/",ApproveRequestMembership.as_view(),name="approve_request_membership"),
-      path("total_requested_memberships/",Totalrequestedmemberships.as_view(),name="total_requested_memberships")
+      path("total_requested_memberships/",Totalrequestedmemberships.as_view(),name="total_requested_memberships"),
+      path('send-newsletter/', SendNewsletterView.as_view(), name='send-newsletter'),
           ]
