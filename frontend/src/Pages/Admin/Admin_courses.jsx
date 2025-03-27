@@ -58,22 +58,22 @@ const Admin_general_info = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {general_info.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.id}</td>
-                                    <td>{item.user.username}</td>
-                                    <td>{item.gender}</td>
-                                    <td>
-                                        <button
-                                            onClick={() => handleDownloadSingleUserInfo(item.id)}
-                                            className='bg-green-500 text-white py-1 px-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500'
-                                        >
-                                            Download
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
+    {general_info.map((item, index) => (
+        <tr key={index}>
+            <td>{item.id}</td>
+            <td>{item.username}</td> {/* Now using item.username directly */}
+            <td>{item.gender}</td>
+            <td>
+                <button
+                    onClick={() => handleDownloadSingleUserInfo(item.id)}
+                    className='bg-green-500 text-white py-1 px-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500'
+                >
+                    Download
+                </button>
+            </td>
+        </tr>
+    ))}
+</tbody>
                     </table>
                 </section>
             </div>
