@@ -79,8 +79,18 @@ class RequestMembershipView(generics.CreateAPIView):
 
 
 
-
-
+class AllrequestedMemberships(generics.ListAPIView):
+    queryset = RequestMembership.objects.all()
+    serializer_class = RequestMembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def list(self, request, *args, **kwargs):
+        queryset = RequestMembership.objects.filter(status='pending')
+        serializer = RequestMembershipSerializer(queryset, many=True)
+        return Response(serializer.data)
+    class ApproveMembershipRequest(generics.UpdateAPIView):
+        queryset = RequestMembership.objects.all()
+        serializer_class = RequestMembershipSerializer
+        permission_classes = [permissions.IsAuthenticated]
 
 @api_view(['GET','POST'])
 def user_list(request):
