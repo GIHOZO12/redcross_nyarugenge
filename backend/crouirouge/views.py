@@ -1063,15 +1063,24 @@ def subscribe_newsletter(request):
      return JsonResponse(data,safe=False)
 @csrf_exempt     
 def add_email_toseubscribenewsletter(request):
-    if request.method =="POST":
-        email=request.POST.get("email")
-        if not email:
-            return JsonResponse({"status": False, "message": "Email field is required"}, status=400)
-        subscribe=SubscribeNewslatter(email=email)
-        subscribe.save()
-        return JsonResponse({"status": True, "message": "Email Subscribed successfully"}, status=201)
-    else:
-        return JsonResponse({"status": False, "message": "Invalid request method"}, status=405)
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        # Check if email already exists
+        if SubscribeNewslatter.objects.filter(email=email).exists():
+            return JsonResponse({
+                'status': 'already_subscribed',
+                'message': 'This email is already subscribed'
+            }, status=200)
+        
+        # If not, create new subscriber
+        SubscribeNewslatter.objects.create(email=email)
+        return JsonResponse({
+            'status': 'subscribed',
+            'message': 'Thank you for subscribing!'
+        }, status=201)
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
     
 
 
