@@ -956,22 +956,28 @@ from django.utils import timezone
 def reply_to_message(request, message_id):
     try:
         message = Messages.objects.get(id=message_id)
-        reply_content = request.POST.get('reply')
         
-        # Update the message with reply
+        # Get data from JSON body instead of POST form
+        data = json.loads(request.body)
+        reply_content = data.get('reply')
+        
+        if not reply_content:
+            return JsonResponse({'error': 'Reply content is required'}, status=400)
+        
+        # Update the message
         message.reply = reply_content
         message.replied_at = timezone.now()
         message.is_replied = True
         message.save()
         
-        # Send email notification to the sender
+        # Send email
         send_mail(
             'Reply to your message from Gihozo',
             f'Hello {message.name},\n\n'
             f'Thank you for your message:\n"{message.description}"\n\n'
             f'Our reply:\n{reply_content}\n\n'
-            'Best regards,\nGihozo Team',
-            'ismailgihozo@gmail.com',  # Your from email
+            'Best regards,\nNyarugenge Red Cross ur campus',
+            'ismailgihozo@gmail.com',
             [message.email],
             fail_silently=False,
         )

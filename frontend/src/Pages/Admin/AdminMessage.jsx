@@ -10,7 +10,7 @@ const AdminMessage = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState("all"); // "all", "unread", "read", "replied"
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     fetchMessages();
@@ -20,16 +20,11 @@ const AdminMessage = () => {
     setIsLoading(true);
     let url = "https://gihozo.pythonanywhere.com/admin_messages/";
     
-    if (filter === "unread") {
-      url = "https://gihozo.pythonanywhere.com/get_unread_messages/";
-    } else if (filter === "read") {
-      url = "https://gihozo.pythonanywhere.com/get_read_messages/";
-    } else if (filter === "replied") {
-      url = "https://gihozo.pythonanywhere.com/get_replied_messages/";
-    }
+    if (filter === "unread") url = "https://gihozo.pythonanywhere.com/get_unread_messages/";
+    else if (filter === "read") url = "https://gihozo.pythonanywhere.com/get_read_messages/";
+    else if (filter === "replied") url = "https://gihozo.pythonanywhere.com/get_replied_messages/";
 
-    axios
-      .get(url)
+    axios.get(url)
       .then((res) => {
         setAdminMessages(res.data);
         setIsLoading(false);
@@ -44,21 +39,17 @@ const AdminMessage = () => {
     if (filter === "unread") return msg.status !== "read";
     if (filter === "read") return msg.status === "read";
     if (filter === "replied") return msg.is_replied;
-    return true; // "all"
+    return true;
   });
 
   function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie) {
-      const cookies = document.cookie.split(";").map((c) => c.trim());
-      for (let cookie of cookies) {
-        if (cookie.startsWith(name + "=")) {
-          cookieValue = decodeURIComponent(cookie.split("=")[1]);
-          break;
-        }
+    const cookies = document.cookie.split(";").map((c) => c.trim());
+    for (let cookie of cookies) {
+      if (cookie.startsWith(name + "=")) {
+        return decodeURIComponent(cookie.split("=")[1]);
       }
     }
-    return cookieValue;
+    return null;
   }
 
   const handleAction = (action) => {
@@ -77,34 +68,33 @@ const AdminMessage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const csrfToken = getCookie("csrftoken");
-        axios
-          .post(
-            "https://gihozo.pythonanywhere.com/update_message_status/",
-            { ids: selectedMessages, action },
-            { 
-              headers: { 
-                "X-CSRFToken": csrfToken, 
-                "Content-Type": "application/json" 
-              },
-              withCredentials: true
-            }
-          )
-          .then(() => {
-            setAdminMessages(prev => 
-              action === "delete" 
-                ? prev.filter(msg => !selectedMessages.includes(msg.id))
-                : prev.map(msg => 
-                    selectedMessages.includes(msg.id) 
-                      ? { ...msg, status: action === "read" ? "read" : msg.status }
-                      : msg
-                  )
-            );
-            Swal.fire("Success", `Messages ${action} successfully`, "success");
-            setSelectedMessages([]);
-          })
-          .catch(() => {
-            Swal.fire("Error", `Failed to ${action} messages`, "error");
-          });
+        axios.post(
+          "https://gihozo.pythonanywhere.com/update_message_status/",
+          { ids: selectedMessages, action },
+          { 
+            headers: { 
+              "X-CSRFToken": csrfToken, 
+              "Content-Type": "application/json" 
+            },
+            withCredentials: true
+          }
+        )
+        .then(() => {
+          setAdminMessages(prev => 
+            action === "delete" 
+              ? prev.filter(msg => !selectedMessages.includes(msg.id))
+              : prev.map(msg => 
+                  selectedMessages.includes(msg.id) 
+                    ? { ...msg, status: action === "read" ? "read" : msg.status }
+                    : msg
+                )
+          );
+          Swal.fire("Success", `Messages ${action} successfully`, "success");
+          setSelectedMessages([]);
+        })
+        .catch(() => {
+          Swal.fire("Error", `Failed to ${action} messages`, "error");
+        });
       }
     });
   };
@@ -124,24 +114,32 @@ const AdminMessage = () => {
       const csrfToken = getCookie("csrftoken");
       setIsLoading(true);
       
+      // Create FormData to properly send the reply
+      const formData = new FormData();
+      formData.append('reply', replyContent);
+      
       const response = await axios.post(
         `https://gihozo.pythonanywhere.com/reply_to_message/${replyingTo.id}/`,
-        { reply: replyContent },
+        formData,
         { 
           headers: { 
-            "X-CSRFToken": csrfToken, 
-            "Content-Type": "application/json" 
+            "X-CSRFToken": csrfToken,
+            "Content-Type": "multipart/form-data"
           },
           withCredentials: true
         }
       );
 
-      Swal.fire("Success", "Reply sent successfully!", "success");
-      setReplyingTo(null);
-      fetchMessages();
+      if (response.data.status === 'success') {
+        Swal.fire("Success", response.data.message || "Reply sent successfully!", "success");
+        setReplyingTo(null);
+        fetchMessages();
+      } else {
+        throw new Error(response.data.error || "Failed to send reply");
+      }
     } catch (error) {
       console.error("Error sending reply:", error);
-      Swal.fire("Error", "Failed to send reply", "error");
+      Swal.fire("Error", error.response?.data?.error || "Failed to send reply", "error");
     } finally {
       setIsLoading(false);
     }
@@ -149,18 +147,12 @@ const AdminMessage = () => {
 
   const toggleSelection = (id) => {
     setSelectedMessages(prev =>
-      prev.includes(id) 
-        ? prev.filter(msgId => msgId !== id) 
-        : [...prev, id]
+      prev.includes(id) ? prev.filter(msgId => msgId !== id) : [...prev, id]
     );
   };
 
   const selectAllMessages = (e) => {
-    if (e.target.checked) {
-      setSelectedMessages(filteredMessages.map(msg => msg.id));
-    } else {
-      setSelectedMessages([]);
-    }
+    setSelectedMessages(e.target.checked ? filteredMessages.map(msg => msg.id) : []);
   };
 
   return (
