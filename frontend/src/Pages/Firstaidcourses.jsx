@@ -71,7 +71,7 @@ const Firstaidcourses = () => {
                   to={`/course/first-aid-courses/${item.id}`} // ✅ Fixed the link
                   className="text-blue-500 hover:text-blue-700 p-9 m-6 cursor-pointer"
                 >
-                  See details
+                  <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2">view more</button>
                 </Link>
               </div>
             </div>
