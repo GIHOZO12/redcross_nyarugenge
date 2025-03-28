@@ -948,6 +948,40 @@ def admin_messages(request):
 
 
 
+from django.core.mail import send_mail
+from django.utils import timezone
+
+@csrf_exempt
+@require_POST
+def reply_to_message(request, message_id):
+    try:
+        message = Messages.objects.get(id=message_id)
+        reply_content = request.POST.get('reply')
+        
+        # Update the message with reply
+        message.reply = reply_content
+        message.replied_at = timezone.now()
+        message.is_replied = True
+        message.save()
+        
+        # Send email notification to the sender
+        send_mail(
+            'Reply to your message from Gihozo',
+            f'Hello {message.name},\n\n'
+            f'Thank you for your message:\n"{message.description}"\n\n'
+            f'Our reply:\n{reply_content}\n\n'
+            'Best regards,\nGihozo Team',
+            'ismailgihozo@gmail.com',  # Your from email
+            [message.email],
+            fail_silently=False,
+        )
+        
+        return JsonResponse({'status': 'success', 'message': 'Reply sent successfully'})
+    except Messages.DoesNotExist:
+        return JsonResponse({'error': 'Message not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 
 

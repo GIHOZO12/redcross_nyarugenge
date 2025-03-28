@@ -203,14 +203,21 @@ class RedcrossLeader(models.Model):
  
 
 class Messages(models.Model):
-     name=models.CharField(max_length=200)
-     email=models.EmailField()
-     description=models.TextField()
-     created_at=models.DateTimeField(auto_now_add=True)
-     status = models.CharField(max_length=20, default="unread")
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default="unread")
+    reply = models.TextField(blank=True, null=True)
+    replied_at = models.DateTimeField(blank=True, null=True)
+    is_replied = models.BooleanField(default=False)
     
-     def __str__(self):
-          return self.name     
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Messages"
+        ordering = ['-created_at']   
      
 
 class SubscribeNewslatter(models.Model):
