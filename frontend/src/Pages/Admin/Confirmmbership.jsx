@@ -42,6 +42,7 @@ const ConfirmMembership = () => {
                         <thead className="bg-gray-200">
                             <tr>
                                 <th className="py-2 px-4 border">Username</th>
+                                <th className="py-2 px-4 border">email</th>
                                 <th className="py-2 px-4 border">Message</th>
                                 <th className="py-2 px-4 border">Action</th>
                             </tr>
@@ -50,6 +51,7 @@ const ConfirmMembership = () => {
                             {requestedMembership.map((request, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
                                     <td className="py-2 px-4 border">{request.username}</td>
+                                    <td className="py-2 px-4 border">{request.email}</td>
                                     <td className="py-2 px-4 border">{request.message}</td>
                                     <td className="py-2 px-4 border">
                                         <button 
