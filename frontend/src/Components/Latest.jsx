@@ -1,21 +1,33 @@
-// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import {formatDistanceToNow} from 'date-fns'
+
+const formatExactTimeDifference = (dateString) => {
+  const pastDate = new Date(dateString + 'Z'); // Force UTC
+  const now = new Date();
+
+  const seconds = Math.floor((now - pastDate) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+
+  if (years > 0) return `${years} year${years !== 1 ? 's' : ''} ago`;
+  if (months > 0) return `${months} month${months !== 1 ? 's' : ''} ago`;
+  if (days > 0) return `${days} day${days !== 1 ? 's' : ''} ago`;
+  if (hours > 0) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  if (minutes > 0) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+  return "just now";
+};
 
 const Latest = () => {
   const [latest, setLatest] = React.useState([]);
 
   React.useEffect(() => {
     axios.get('https://gihozo.pythonanywhere.com/latest_fellowership/')
-      .then(response => {
-        // console.log("Fetched data:", response.data);  // Debugging
-        setLatest(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching data:", error);
-      });
+      .then(response => setLatest(response.data))
+      .catch(error => console.error("Error fetching data:", error));
   }, []);
 
   return (
@@ -27,19 +39,23 @@ const Latest = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {latest.map((item, index) => (
-          <motion.div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-shadow duration-300"
-           initial={{opacity:0.2,y:100}}
-           transition={{duration:2}}
-           whileInView={{opacity:1,y:0}}
-           viewport={{once:true}}
+          <motion.div 
+            key={index} 
+            className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-shadow duration-300"
+            initial={{ opacity: 0.2, y: 100 }}
+            transition={{ duration: 2 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
             <article>
-            <img 
-              src={item.fellowership_image} 
-              alt="fellowership_image" 
-              className="w-full h-48 object-cover"
-            />
-            <p className='text-right text-gray-600'>{ formatDistanceToNow(new Date(item.created_at),{addSuffix:true}) } </p>
+              <img 
+                src={item.fellowership_image} 
+                alt="fellowership_image" 
+                className="w-full h-48 object-cover"
+              />
+              <p className='text-right text-gray-600 pr-2 pt-1'>
+                {formatExactTimeDifference(item.created_at)}
+              </p>
             </article>
             <div className="p-4">
               <h2 className="text-xl font-semibold text-gray-800">{item.title}</h2>
