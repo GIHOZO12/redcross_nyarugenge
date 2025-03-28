@@ -55,7 +55,7 @@ urlpatterns = [
      path("all_subscribes/",views.subscribe_newsletter,name="subscribe_newsletter"),
      path("add_email_toseubscribenewsletter/",views.add_email_toseubscribenewsletter,name="add_email_toseubscribenewsletter"),
     path('send_newsletter/', views.send_newsletter, name='send_newsletter'),
-    path("message_replay", views.reply_to_message, name="reply_to_message")
+  path("reply_to_message/<int:message_id>/", views.reply_to_message, name="reply_to_message"),
    
 
     ]
