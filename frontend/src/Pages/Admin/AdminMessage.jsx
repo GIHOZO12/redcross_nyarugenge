@@ -109,34 +109,26 @@ const AdminMessage = () => {
       Swal.fire("Error", "Please enter a reply message", "error");
       return;
     }
-
+  
     try {
       const csrfToken = getCookie("csrftoken");
       setIsLoading(true);
       
-      // Create FormData to properly send the reply
-      const formData = new FormData();
-      formData.append('reply', replyContent);
-      
       const response = await axios.post(
         `https://gihozo.pythonanywhere.com/reply_to_message/${replyingTo.id}/`,
-        formData,
+        { reply: replyContent },  // Send as JSON object
         { 
           headers: { 
-            "X-CSRFToken": csrfToken,
-            "Content-Type": "multipart/form-data"
+            "X-CSRFToken": csrfToken, 
+            "Content-Type": "application/json"  // Crucial header
           },
           withCredentials: true
         }
       );
-
-      if (response.data.status === 'success') {
-        Swal.fire("Success", response.data.message || "Reply sent successfully!", "success");
-        setReplyingTo(null);
-        fetchMessages();
-      } else {
-        throw new Error(response.data.error || "Failed to send reply");
-      }
+  
+      Swal.fire("Success", "Reply sent successfully!", "success");
+      setReplyingTo(null);
+      fetchMessages();
     } catch (error) {
       console.error("Error sending reply:", error);
       Swal.fire("Error", error.response?.data?.error || "Failed to send reply", "error");
