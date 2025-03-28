@@ -125,7 +125,7 @@ const AdminMessage = () => {
       setIsLoading(true);
       
       const response = await axios.post(
-        `http://127.0.0.1:8000/reply_to_message/${replyingTo.id}/`,
+        `https://gihozo.pythonanywhere.com/reply_to_message/${replyingTo.id}/`,
         { reply: replyContent },
         { 
           headers: { 
