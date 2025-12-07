@@ -1,12 +1,10 @@
 import React, { useContext, useState } from "react";
-import { FaEnvelope, FaGoogle, FaLock, FaTimes, FaUser } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
 import { AppContext } from "../AppContext/Appcontext";
 import axios from "axios";
 import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 import { ClipLoader } from "react-spinners"; // Import a loading spinner
 import { useNavigate } from "react-router-dom";
-import Google from '../assets/google.jpg'
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
@@ -17,61 +15,6 @@ const Join = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const { setUser, showlogin, setshowlogin, resetpassword, setresetpassword } =
     useContext(AppContext);
-
-
-
-    const handleGoogleLoginSuccess = async (credentialResponse) => {
-      try {
-        setLoading(true);
-        const response = await axios.post(
-          "http://127.0.0.1:8000/api/google/login/",
-          {
-            access_token: credentialResponse.credential,
-            id_token: credentialResponse.credential 
-          }
-        );
-  
-        const { access, role, refresh, username, is_superuser, is_staff } = response.data;
-  
-        // Store tokens in localStorage
-        localStorage.setItem("access_token", access);
-        localStorage.setItem("refresh_token", refresh);
-        localStorage.setItem("username", username);
-        localStorage.setItem("is_superuser", is_superuser);
-        localStorage.setItem("is_staff", is_staff);
-        localStorage.setItem("role", role);
-  
-        // Set refresh_token in cookies
-        document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
-  
-        // Set axios Authorization header
-        axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
-  
-        // Update user state
-        setUser({
-          is_authenticated: true,
-          username: username,
-          is_superuser: is_superuser,
-          is_staff: is_staff,
-          role: role,
-        });
-  
-        // Hide login modal
-        setshowlogin(false);
-  
-        // Redirect after login
-        window.location.href = "/";
-      } catch (error) {
-        setMessage(error.response?.data?.message || "Google login failed");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    const handleGoogleLoginFailure = () => {
-      setMessage("Google login failed");
-    };
-  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -223,27 +166,6 @@ const Join = () => {
                   >
                     Forgot password?
                   </a>
-                  <div className="mt-4 flex flex-col items-center">
-                <p className="mb-2">Or continue with</p>
-                
-                {/* Custom Google login button with your image */}
-                <GoogleOAuthProvider clientId="763995702933-7e6hpjuh3a7he013dimj2tqv8ki6vh9q.apps.googleusercontent.com">
-  <GoogleLogin
-    onSuccess={handleGoogleLoginSuccess}
-    onError={handleGoogleLoginFailure}
-    useOneTap
-    auto_select
-    ux_mode="popup"  // Add this line
-    redirect_uri="http://localhost:5173"  // Must match exactly
-    render={(renderProps) => (
-      <button onClick={renderProps.onClick}>
-        <img src={Google} alt="Google" className="w-6 h-6 mr-2"/>
-        Continue with Google
-      </button>
-    )}
-  />
-</GoogleOAuthProvider>
-              </div>
                   <p className="mt-4 text-sm text-center">
                     New to the app?{" "}
                     <a
