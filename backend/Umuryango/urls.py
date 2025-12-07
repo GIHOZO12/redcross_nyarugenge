@@ -27,6 +27,10 @@ urlpatterns = [
     path('api/',include('api.urls')),
     path("",include("crouirouge.urls")),
     path('api-auth/',include('rest_framework.urls')),
+    path('accounts/', include('allauth.urls')),
+      path('api/auth/', include('dj_rest_auth.urls')),
+path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+
 ]
 if settings.DEBUG:
    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

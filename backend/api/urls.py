@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import ( Allrequestedmemberships, ApproveRequestMembership, ChangeProfilePictureView, LoginView, RequestMembershipView,ResetPasswordView,Admin_all_generalinformation, SendNewsletterView, Totalrequestedmemberships, add_user_info,  download_single_user_info, logout_view, user_list,family_list,announcement_list,
+from .views import ( Allrequestedmemberships, ApproveRequestMembership, ChangeProfilePictureView, GoogleLogin, LoginView, RequestMembershipView,ResetPasswordView,Admin_all_generalinformation, SendNewsletterView, Totalrequestedmemberships, add_user_info,  download_single_user_info, logout_view, user_list,family_list,announcement_list,
                     members_list,felloweship_list,redcrossactivities_list,current_user
                     ,first_id_course_list,Createuserview,GeneralInformation,ProofOfRegistrationView,EditGeneralInformation)
 
@@ -18,6 +18,7 @@ urlpatterns = [
     path('first_ai_course_list/',first_id_course_list,name='first_ai_course_list'),
     path('register/',Createuserview.as_view(),name='register'),
         path("login/", LoginView.as_view(), name="login"),
+           path('google/login/', GoogleLogin.as_view(), name='google_login'),
         path("current_user/", current_user, name="current_user"),
         path('logout/', logout_view, name='logout'),
     path('token/',TokenObtainPairView.as_view(),name='token_obtain_pair'),

@@ -1,4 +1,6 @@
 from io import BytesIO
+import json
+import logging
 import os
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -329,6 +331,50 @@ class Createuserview(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+
+
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client # type: ignore
+from dj_rest_auth.registration.views import SocialLoginView # type: ignore
+from rest_framework_simplejwt.tokens import RefreshToken # type: ignore
+
+
+logger = logging.getLogger(__name__)  # Logging setup
+
+@method_decorator(csrf_exempt, name="dispatch")  # Bypass CSRF for testing
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+    callback_url = "http://localhost:5173"
+
+    def post(self, request, *args, **kwargs):
+        try:
+            logger.info(f"Received request: {json.loads(request.body)}")  # Log request body
+            
+            response = super().post(request, *args, **kwargs)
+
+            if response.status_code == 200:
+                user = self.user
+                refresh = RefreshToken.for_user(user)
+
+                return Response({
+                    "message": "Login successful",
+                    "username": user.username,
+                    "email":user.email,
+                    "role": user.role,
+                    "is_superuser": user.is_superuser,
+                    "is_staff": user.is_staff,
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                }, status=status.HTTP_200_OK)
+
+            return response  # Return original response if not 200
+
+        except Exception as e:
+            logger.error(f"Google login error: {str(e)}")  # Log error details
+            return JsonResponse({"error": str(e)}, status=400)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
