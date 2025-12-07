@@ -78,9 +78,9 @@ const Sidebar = () => {
 </li>
 
 
-            {/* <li>
+             <li>
               <Link to="/admin/Redscrossactivies" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700"><FaHandsHelping/>Activities</Link>
-            </li> */}
+            </li> 
             <li>
               <Link to="/admin/myfelowership" className="flex items-center gap-2 p-3 rounded hover:bg-blue-700">< FaUserFriends/>Fellowship</Link>
             </li>
