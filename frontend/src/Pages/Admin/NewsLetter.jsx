@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useQuill } from 'react-quilljs'; // or any other rich text editor
 import 'quill/dist/quill.snow.css'; // Styles for the editor
 import AdminLayout from '../../Layout/AdminLayout';
+import { newsletterService, getErrorMessage } from '../../api';
 
 const NewsletterComposer = ({ onClose }) => {
     const [subject, setSubject] = useState('');
     const { quill, quillRef } = useQuill();
     const [isSending, setIsSending] = useState(false);
     
-    const getCSRFToken = () => {
-        const csrfToken = document.cookie
-          .split(';')
-          .find(cookie => cookie.trim().startsWith('csrftoken='))
-          ?.split('=')[1];
-        return csrfToken;
-    };
-
     const handleSend = async () => {
         if (!subject || !quill.getText().trim()) {
             alert('Please enter a subject and email content');
@@ -30,32 +22,16 @@ const NewsletterComposer = ({ onClose }) => {
         setIsSending(true);
         
         try {
-            const htmlContent = quill.root.innerHTML;
-            const plainContent = quill.getText();
-            
-            const csrfToken = getCSRFToken();
-            
-            const response = await axios.post(
-                "https://gihozo.pythonanywhere.com/send_newsletter/",
-                {
-                    subject,
-                    html_content: htmlContent,
-                    plain_content: plainContent
-                },
-                {
-                    headers: {
-                        "X-CSRFToken": csrfToken,
-                        "Content-Type": "application/json"
-                    },
-                    withCredentials: true
-                }
-            );
-            
-            alert(response.data.message);
+            const data = await newsletterService.send({
+                subject,
+                html_content: quill.root.innerHTML,
+                plain_content: quill.getText(),
+            });
+
+            alert(data?.message || 'Newsletter sent successfully!');
             onClose();
         } catch (error) {
-            console.error('Error sending newsletter:', error);
-            alert(error.response?.data?.message || 'Failed to send newsletter');
+            alert(getErrorMessage(error, 'Failed to send newsletter'));
         } finally {
             setIsSending(false);
         }

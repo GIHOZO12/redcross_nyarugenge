@@ -5,6 +5,8 @@ import { FaChevronDown, FaBars, FaTimes } from "react-icons/fa";
 import Logo1 from '../assets/Red cross logo.jpg';
 import profile_icon from "../assets/profile_icon.png";
 import { AppContext } from "../AppContext/Appcontext";
+import { authService, mediaUrl } from "../api";
+import { DJANGO_ADMIN_URL } from "../config/env";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -19,24 +21,9 @@ const Navbar = () => {
 
   // Fetch current user data
   const fetchCurrentUser = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
-
     try {
-      const response = await fetch("https://gihozo.pythonanywhere.com/api/current_user/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Current User Data:", data);
-        setProfileImage(data.profile_image); // Set profile image
-      } else {
-        console.error("Failed to fetch current user");
-      }
+      const data = await authService.getCurrentUser();
+      if (data) setProfileImage(data.profile_image); // Set profile image
     } catch (error) {
       console.error("Error fetching current user:", error);
     }
@@ -48,63 +35,21 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = async () => {
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      console.error("User is not authenticated.");
-      return;
-    }
-  
-    // Retrieve refresh token from cookies
-    const refreshToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('refresh_token='))
-      ?.split('=')[1];
-  
-    if (!refreshToken) {
-      console.error("Refresh token is missing. Cookies:", document.cookie);
-      return;
-    }
-  
     try {
-      // Send logout request to the backend
-      const response = await fetch("https://gihozo.pythonanywhere.com/api/logout/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,  // Include the access token in the headers
-        },
-        body: JSON.stringify({ refresh: refreshToken }),  // Send refresh token in the body
+      // Blacklists the refresh token on the backend, then clears local session.
+      await authService.logout();
+
+      // Update user state in context
+      setUser({
+        is_authenticated: false,
+        username: null,
+        is_superuser: false,
+        is_staff: false,
+        role: null,
       });
-  
-      if (!response.ok) {
-        console.error("Logout failed:", response.status, response.statusText);
-        alert("Logout failed. Please try again.");
-      } else {
-        console.log("Logged out successfully");
-  
-        // Clear local storage
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("is_superuser");
-        localStorage.removeItem("is_staff");
-        localStorage.removeItem("role");
-  
-        // Clear refresh token cookie
-        document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; SameSite=None";
-  
-        // Update user state in context
-        setUser({
-          is_authenticated: false,
-          username: null,
-          is_superuser: false,
-          is_staff: false,
-          role: null,
-        });
-  
-        // Redirect to homepage
-        window.location.href = "/";
-      }
+
+      // Redirect to homepage
+      window.location.href = "/";
     } catch (error) {
       console.error("Error logging out:", error);
       alert("An error occurred during logout. Please try again.");
@@ -281,7 +226,7 @@ const Navbar = () => {
             )}
 
             {user.is_authenticated && user.is_superuser && (
-              <Link to={`${import.meta.env.VITE_BACKEND_URL}/admin/`} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to={DJANGO_ADMIN_URL} onClick={() => setIsMobileMenuOpen(false)}>
                 <li className="text-white cursor-pointer hover:text-gray-300">
                   Super Admin
                 </li>
@@ -296,7 +241,7 @@ const Navbar = () => {
             <p className="text-gray-100 max-sm:hidden">Hi, {user.username}</p>
             {profileImage ? (
               <img
-                src={`https://gihozo.pythonanywhere.com/${profileImage}`}
+                src={mediaUrl(profileImage)}
                 alt="Profile"
                 className="h-8 w-8 rounded-full border"
                 onError={(e) => {

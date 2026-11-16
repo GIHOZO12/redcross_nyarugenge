@@ -1,35 +1,23 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
+import { membershipService, getErrorMessage } from '../../api';
+import { useFetch } from '../../hooks';
 
 const ConfirmMembership = () => {
-    const [requestedMembership, setRequestedMembership] = useState([]);
-    
-    useEffect(() => {
-        fetchMembershipRequests();
-    }, []);
-
-    const fetchMembershipRequests = () => {
-        axios.get("https://gihozo.pythonanywhere.com/api/all_requested_memberships/")
-            .then((response) => {
-                setRequestedMembership(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching requests:", error);
-            });
-    };
+    const {
+        data: requestedMembership,
+        refetch: fetchMembershipRequests,
+    } = useFetch(membershipService.allRequests, [], []);
 
     const confirmMembership = (requestId) => {
-        axios.post(`https://gihozo.pythonanywhere.com/api/approve_request_membership/${requestId}/`)
-            .then((response) => {
+        membershipService.approve(requestId)
+            .then(() => {
                 // Refresh the list after successful approval
-                console.log(response.data);
                 fetchMembershipRequests();
                 alert('Membership approved successfully!');
             })
             .catch((error) => {
-                console.error("Error approving membership:", error);
-                alert('Error approving membership');
+                alert(getErrorMessage(error, 'Error approving membership'));
             });
     };
 

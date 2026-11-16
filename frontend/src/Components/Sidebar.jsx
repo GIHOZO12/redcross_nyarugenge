@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaAllergies, FaBars, FaEnvelope, FaTachometerAlt, FaTimes, FaUserAlt } from "react-icons/fa";
-import axios from "axios";
+import { messagesService, newsletterService, membershipService } from "../api";
+import { useFetch } from "../hooks";
 import { MdDashboard } from "react-icons/md";
 import { MdFamilyRestroom } from "react-icons/md";
 import {FaHandsHelping} from 'react-icons/fa'
@@ -11,48 +12,12 @@ import {  FaUserFriends  } from "react-icons/fa";
  
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [allmessage,setAllMessage]=useState()
-  const [newlatter,setNewltter]=useState()
-  const [allrequsted,setAllrequested]=useState()
 
-  useEffect(()=>{
-    axios.get("https://gihozo.pythonanywhere.com/all_messages/")
-    .then((response)=>{
-      setAllMessage(response.data)
-    }).catch((error)=>{
-      console.error("error fetching data",error)
-    })
-  })
-
-  useEffect(()=>{
-    axios.get("https://gihozo.pythonanywhere.com/all_letter/")
-    .then((res)=>{
-   setNewltter(res.data)
-    }).catch((error)=>{
-      console.error("error fetching data",error)
-    })
-  })
-
-  useEffect(() => {
-    const fetchRequestedMemberships = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(
-          "https://gihozo.pythonanywhere.com/api/total_requested_memberships/", 
-          {
-            headers: { 
-              'Authorization': `Bearer ${token}` 
-            }
-          }
-        );
-        setAllrequested(response.data.total_requests);
-      } catch (error) {
-        console.error("Error fetching requested memberships:", error);
-      }
-    };
-  
-    fetchRequestedMemberships();
-  }, []);
+  // These three ran on every render before (no dependency array), which meant a
+  // request loop. `useFetch` fetches once per mount instead.
+  const { data: allmessage } = useFetch(messagesService.all, [], []);
+  const { data: newlatter } = useFetch(newsletterService.letters, [], []);
+  const { data: allrequsted } = useFetch(membershipService.totalRequests, [], 0);
 
   return (
     <>

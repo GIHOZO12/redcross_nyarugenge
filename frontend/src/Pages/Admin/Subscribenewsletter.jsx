@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
+import { newsletterService, getErrorMessage } from '../../api';
+import { useFetch } from '../../hooks';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -101,42 +102,21 @@ const NewsletterComposer = ({ onClose, onSend }) => {
 };
 
 const Subscribenewsletter = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
   const [showComposer, setShowComposer] = useState(false);
 
-  const getCSRFToken = () => {
-    const csrfToken = document.cookie
-      .split(';')
-      .find(cookie => cookie.trim().startsWith('csrftoken='))
-      ?.split('=')[1];
-    return csrfToken;
-  };
-
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/all_subscribes/")
-      .then((res) => setSubscriptions(res.data))
-      .catch((error) => console.error("Error fetching subscriptions", error));
-  }, []);
+  const { data: subscriptions } = useFetch(newsletterService.subscribers, [], []);
 
   const handleSendNewsletter = async ({ subject, htmlContent, plainContent }) => {
-    const csrfToken = getCSRFToken();
-    
     try {
-      const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/send_newsletter/",
-        { subject, html_content: htmlContent, plain_content: plainContent },
-        {
-          headers: {
-            "X-CSRFToken": csrfToken,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true
-        }
-      );
-      alert(response.data.message || 'Newsletter sent successfully!');
-      return response.data;
+      const data = await newsletterService.send({
+        subject,
+        html_content: htmlContent,
+        plain_content: plainContent,
+      });
+      alert(data?.message || 'Newsletter sent successfully!');
+      return data;
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to send newsletter');
+      alert(getErrorMessage(error, 'Failed to send newsletter'));
       throw error;
     }
   };

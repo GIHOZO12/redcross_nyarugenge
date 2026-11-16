@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Swal from 'sweetalert2';
-import { refreshToken, isTokenExpired } from '../../Components/auth';
+import { authService, usersService, getErrorMessage } from '../../api';
 
 const RwandaRedCrossForm = () => {
   const [formData, setFormData] = useState({
@@ -24,55 +23,40 @@ const RwandaRedCrossForm = () => {
   const [existingData, setExistingData] = useState(null);
   const [nationalIdError, setNationalIdError] = useState(''); // State for national ID error
 
+  // The API client refreshes an expired access token on its own.
   const fetchCurrentUser = async () => {
-    let token = localStorage.getItem('access_token');
-    if (token && isTokenExpired(token)) {
-      console.log('Token expired. Refreshing token...');
-      token = await refreshToken();
-      if (!token) {
-        console.error('Failed to refresh token. Redirecting to login...');
-        return;
-      }
-    }
-
     try {
-      const response = await axios.get('https://gihozo.pythonanywhere.com/api/current_user/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setCurrentUser(response.data);
-      fetchExistingData(response.data.id); // Fetch existing data for the current user
+      const user = await authService.getCurrentUser();
+      if (!user) return;
+      setCurrentUser(user);
+      fetchExistingData(user.id); // Fetch existing data for the current user
     } catch (error) {
-      console.error('Error fetching current user:', error);
+      console.error('Error fetching current user:', getErrorMessage(error));
     }
   };
 
   const fetchExistingData = async (userId) => {
     try {
-      const response = await axios.get(`https://gihozo.pythonanywhere.com/api/edit_general_information/${userId}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
-      setExistingData(response.data);
+      const data = await usersService.getGeneralInformation(userId);
+      setExistingData(data);
       setFormData({
-        names: response.data.name,
-        nationalId: response.data.nationalId,
-        gender: response.data.gender,
-        department: response.data.department,
-        email: response.data.email,
-        regno: response.data.regno,
-        province: response.data.address.province,
-        district: response.data.address.district,
-        sector: response.data.address.sector,
-        cell: response.data.address.cell,
-        village: response.data.address.village,
-        donated: response.data.blood_donated.donated,
-        donated_times: response.data.blood_donated.donated_times,
+        names: data.name,
+        nationalId: data.nationalId,
+        gender: data.gender,
+        department: data.department,
+        email: data.email,
+        regno: data.regno,
+        province: data.address.province,
+        district: data.address.district,
+        sector: data.address.sector,
+        cell: data.address.cell,
+        village: data.address.village,
+        donated: data.blood_donated.donated,
+        donated_times: data.blood_donated.donated_times,
       });
-    } catch (error) {
-      console.error('Error fetching existing data:', error);
+    } catch {
+      // No record yet is the normal case for a first-time member.
+      setExistingData(null);
     }
   };
 
@@ -97,15 +81,8 @@ const RwandaRedCrossForm = () => {
     }
   };
 
-  const checkNationalIdExists = async (nationalId) => {
-    try {
-      const response = await axios.get(`https://gihozo.pythonanywhere.com/api/check_national_id/?nationalId=${nationalId}`);
-      return response.data.exists;
-    } catch (error) {
-      console.error('Error checking national ID:', error);
-      return false;
-    }
-  };
+  const checkNationalIdExists = (nationalId) =>
+    usersService.isNationalIdTaken(nationalId);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -132,32 +109,23 @@ const RwandaRedCrossForm = () => {
     try {
       if (existingData) {
         // Update existing data
-        const response = await axios.put(
-          `https://gihozo.pythonanywhere.com/api/edit_general_information/${currentUser.id}/`,
-          {
-            name: formData.names,
-            nationalId: formData.nationalId,
-            gender: formData.gender,
-            department: formData.department,
-            address: {
-              province: formData.province,
-              district: formData.district,
-              sector: formData.sector,
-              cell: formData.cell,
-              village: formData.village,
-            },
-            blood_donated: {
-              donated: formData.donated,
-              donated_times: formData.donated_times,
-            },
+        await usersService.updateGeneralInformation(currentUser.id, {
+          name: formData.names,
+          nationalId: formData.nationalId,
+          gender: formData.gender,
+          department: formData.department,
+          address: {
+            province: formData.province,
+            district: formData.district,
+            sector: formData.sector,
+            cell: formData.cell,
+            village: formData.village,
           },
-          {
-            headers: {
-              'X-CSRFToken': getCookie('csrftoken'),
-              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-            },
-          }
-        );
+          blood_donated: {
+            donated: formData.donated,
+            donated_times: formData.donated_times,
+          },
+        });
         Swal.fire({
           title: 'Information Updated Successfully!',
           text: 'Your information has been updated.',
@@ -186,34 +154,26 @@ const RwandaRedCrossForm = () => {
         });
       } else {
         // Submit new data
-        const response = await axios.post(
-          'https://gihozo.pythonanywhere.com/api/general_information/',
-          {
+        await usersService.createGeneralInformation({
+          user: currentUser.id,
+          name: formData.names,
+          nationalId: formData.nationalId,
+          gender: formData.gender,
+          department: formData.department,
+          address: {
             user: currentUser.id,
-            name: formData.names,
-            nationalId: formData.nationalId,
-            gender: formData.gender,
-            department: formData.department,
-            address: {
-              user: currentUser.id,
-              province: formData.province,
-              district: formData.district,
-              sector: formData.sector,
-              cell: formData.cell,
-              village: formData.village,
-            },
-            blood_donated: {
-              user: currentUser.id,
-              donated: formData.donated,
-              donated_times: formData.donated_times,
-            },
+            province: formData.province,
+            district: formData.district,
+            sector: formData.sector,
+            cell: formData.cell,
+            village: formData.village,
           },
-          {
-            headers: {
-              'X-CSRFToken': getCookie('csrftoken'),
-            },
-          }
-        );
+          blood_donated: {
+            user: currentUser.id,
+            donated: formData.donated,
+            donated_times: formData.donated_times,
+          },
+        });
         Swal.fire({
           title: 'Form Submitted Successfully!',
           text: 'Click below to download your proof of registration.',
@@ -240,7 +200,7 @@ const RwandaRedCrossForm = () => {
       } else {
         Swal.fire({
           title: 'Error!',
-          text: 'An error occurred while submitting the form. Please try again.',
+          text: getErrorMessage(error, 'An error occurred while submitting the form. Please try again.'),
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -248,39 +208,14 @@ const RwandaRedCrossForm = () => {
     }
   };
 
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + '=') {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  };
-
   const handleDownloadProof = async () => {
     try {
-      const response = await axios.get(
-        `https://gihozo.pythonanywhere.com/api/proof_of_registration/${currentUser.id}/`,
-        {
-          responseType: 'blob',
-        }
+      await usersService.downloadProofOfRegistration(
+        currentUser.id,
+        'proof_of_registration.pdf'
       );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'proof_of_registration.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
     } catch (error) {
-      console.error('Error downloading proof:', error.response?.data || error.message);
+      Swal.fire('Error', getErrorMessage(error, 'Error downloading proof'), 'error');
     }
   };
 

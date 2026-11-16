@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { activitiesService } from '../api';
+import { useFetch } from '../hooks';
 
 const formatExactTimeDifference = (dateString) => {
   // Parse the date string as UTC (force timezone consistency)
@@ -23,17 +24,7 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const Humanity = () => {
-  const [activities, setActivities] = useState([]);
-
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/latest_redcross_activities/")
-      .then((response) => {
-        setActivities(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching latest activities:', error);
-      });
-  }, []);
+  const { data: activities } = useFetch(activitiesService.latest, [], []);
 
   return (
     <div className="p-4">

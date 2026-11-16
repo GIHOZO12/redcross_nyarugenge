@@ -1,24 +1,14 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
+import { messagesService, authService, getErrorMessage } from '../api';
 
 const Ideas = () => {
   const [message, setMessage] = useState({ name: '', email: '', description: '' });
   const [data, setData] = useState('');
-  const [csrfToken, setCsrfToken] = useState('');
 
-  // Fetch CSRF token on component mount
+  // Prime Django's CSRF cookie; the API client attaches the header itself.
   useEffect(() => {
-    fetch('https://gihozo.pythonanywhere.com/user_get_token/', {
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setCsrfToken(data.csrfToken);
-      })
-      .catch((error) => {
-        console.error('Error fetching CSRF token:', error);
-      });
+    authService.fetchUserToken();
   }, []);
 
   const handleChange = (e) => {
@@ -29,45 +19,24 @@ const Ideas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!csrfToken) {
-      Swal.fire('Error', 'CSRF token missing. Please refresh the page.', 'error');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('name', message.name);
-    formData.append('email', message.email);
-    formData.append('description', message.description);
-
-    // Debugging: Log the form data before sending
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-
     try {
-      const response = await axios.post(
-        'https://gihozo.pythonanywhere.com/messages_info/',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'X-CSRFToken': csrfToken,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await messagesService.send({
+        name: message.name,
+        email: message.email,
+        description: message.description,
+      });
 
       // Reset the form fields
       setMessage({ name: '', email: '', description: '' });
-      setData(response.data.message);
+      setData(response?.message || '');
       Swal.fire('Success', 'Idea added successfully', 'success');
 
       // Optional: Reset the form using DOM (fallback)
       e.target.reset();
     } catch (error) {
-      console.error('Error adding idea', error);
-      setData('Error adding idea');
-      Swal.fire('Error', 'Error adding idea', 'error');
+      const text = getErrorMessage(error, 'Error adding idea');
+      setData(text);
+      Swal.fire('Error', text, 'error');
     }
   };
 

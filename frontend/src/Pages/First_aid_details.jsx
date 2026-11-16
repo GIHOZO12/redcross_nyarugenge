@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { useParams } from "react-router-dom"; // ✅ Get ID from URL
-import axios from "axios";
+import { coursesService } from "../api";
+import { useFetch } from "../hooks";
 
 const FirstAidDetails = () => {
   const { id } = useParams(); // ✅ Extract the course ID from URL
-  const [courseDetails, setCourseDetails] = useState(null);
 
-  useEffect(() => {
-    axios
-      .get(`https://gihozo.pythonanywhere.com/first-aid_course/${id}/`) // ✅ Fixed API URL
-      .then((response) => {
-        setCourseDetails(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching course details:", error);
-      });
-  }, [id]);
+  const {
+    data: courseDetails,
+    loading,
+    error,
+  } = useFetch(useCallback(() => coursesService.firstAidDetail(id), [id]), [id]);
 
-  if (!courseDetails) return <p className="text-center text-xl font-semibold text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-center text-xl font-semibold text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-xl font-semibold text-red-500">{error}</p>;
+  if (!courseDetails) return <p className="text-center text-xl font-semibold text-gray-500">Course not found.</p>;
 
   return (
     <div className="min-h-screen bg-gray-50 pt-28 px-6">

@@ -1,39 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-
-// Function to get the CSRF token from cookies
-const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-};
+import { announcementsService, getErrorMessage } from '../../api';
+import { useFetch } from '../../hooks';
 
 const Admin_announcement = () => {
     const navigate = useNavigate();
-    const [anounce, setanounce] = useState([]);
-
-    // Fetch announcements
-    useEffect(() => {
-        axios.get("https://gihozo.pythonanywhere.com/admin_announcement/", { withCredentials: true })
-            .then(response => {
-                setanounce(response.data.announcements);
-            })
-            .catch(error => {
-                console.error("Error fetching announcements", error);
-            });
-    }, []);
+    const { data: anounce, setData: setanounce } = useFetch(
+        announcementsService.adminList,
+        [],
+        []
+    );
 
     // Delete announcement
     const deleteAnnounce = (id) => {
@@ -54,25 +32,17 @@ const Admin_announcement = () => {
             confirmButtonText: "Yes, delete it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`https://gihozo.pythonanywhere.com/admin_delete_announcement/${id}/`, {
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken"),  // Include CSRF token in header
-                        "Content-Type": "application/json"
-                    },
-                    withCredentials: true,  // Include credentials in the request
-                })
-                .then(response => {
-                    console.log("✅ Delete Response:", response.data);
-                    if (response.data.status) {
-                        setanounce(anounce.filter(item => item.id !== id)); // Remove deleted item from the UI
-                        Swal.fire("Deleted!", "Your announcement has been deleted.", "success");
-                    } else {
-                        Swal.fire("Error!", "Delete failed.", "error");
+                announcementsService.remove(id)
+                .then(data => {
+                    if (data && data.status === false) {
+                        Swal.fire("Error!", data.message || "Delete failed.", "error");
+                        return;
                     }
+                    setanounce(current => current.filter(item => item.id !== id)); // Remove deleted item from the UI
+                    Swal.fire("Deleted!", "Your announcement has been deleted.", "success");
                 })
                 .catch(error => {
-                    console.error("❌ Error deleting announcement", error);
-                    Swal.fire("Error!", "Delete failed.", "error");
+                    Swal.fire("Error!", getErrorMessage(error, "Delete failed."), "error");
                 });
             }
         });

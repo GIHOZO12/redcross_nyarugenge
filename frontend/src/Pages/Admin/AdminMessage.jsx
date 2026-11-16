@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AdminLayout from "../../Layout/AdminLayout";
-import axios from "axios";
 import Swal from "sweetalert2";
+import { messagesService, getErrorMessage } from "../../api";
+import { useFetch } from "../../hooks";
 
 
 const formatExactTimeDifference = (dateString) => {
@@ -25,35 +26,21 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const AdminMessage = () => {
-  const [adminMessages, setAdminMessages] = useState([]);
   const [selectedMessages, setSelectedMessages] = useState([]);
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    fetchMessages();
-  }, [filter]);
+  // The service picks the right endpoint for the active filter.
+  const {
+    data: adminMessages,
+    loading: isFetching,
+    setData: setAdminMessages,
+    refetch: fetchMessages,
+  } = useFetch(() => messagesService.inbox(filter), [filter], []);
 
-  const fetchMessages = () => {
-    setIsLoading(true);
-    let url = "https://gihozo.pythonanywhere.com/admin_messages/";
-    
-    if (filter === "unread") url = "https://gihozo.pythonanywhere.com/get_unread_messages/";
-    else if (filter === "read") url = "https://gihozo.pythonanywhere.com/get_read_messages/";
-    else if (filter === "replied") url = "https://gihozo.pythonanywhere.com/get_replied_messages/";
-
-    axios.get(url)
-      .then((res) => {
-        setAdminMessages(res.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data", error);
-        setIsLoading(false);
-      });
-  };
+  const isLoading = isFetching || isSending;
 
   const filteredMessages = adminMessages.filter((msg) => {
     if (filter === "unread") return msg.status !== "read";
@@ -61,16 +48,6 @@ const AdminMessage = () => {
     if (filter === "replied") return msg.is_replied;
     return true;
   });
-
-  function getCookie(name) {
-    const cookies = document.cookie.split(";").map((c) => c.trim());
-    for (let cookie of cookies) {
-      if (cookie.startsWith(name + "=")) {
-        return decodeURIComponent(cookie.split("=")[1]);
-      }
-    }
-    return null;
-  }
 
   const handleAction = (action) => {
     if (selectedMessages.length === 0) {
@@ -87,18 +64,7 @@ const AdminMessage = () => {
       confirmButtonText: `Yes, ${action} them!`
     }).then((result) => {
       if (result.isConfirmed) {
-        const csrfToken = getCookie("csrftoken");
-        axios.post(
-          "https://gihozo.pythonanywhere.com/update_message_status/",
-          { ids: selectedMessages, action },
-          { 
-            headers: { 
-              "X-CSRFToken": csrfToken, 
-              "Content-Type": "application/json" 
-            },
-            withCredentials: true
-          }
-        )
+        messagesService.updateStatus(selectedMessages, action)
         .then(() => {
           setAdminMessages(prev => 
             action === "delete" 
@@ -112,8 +78,8 @@ const AdminMessage = () => {
           Swal.fire("Success", `Messages ${action} successfully`, "success");
           setSelectedMessages([]);
         })
-        .catch(() => {
-          Swal.fire("Error", `Failed to ${action} messages`, "error");
+        .catch((error) => {
+          Swal.fire("Error", getErrorMessage(error, `Failed to ${action} messages`), "error");
         });
       }
     });
@@ -131,29 +97,16 @@ const AdminMessage = () => {
     }
   
     try {
-      const csrfToken = getCookie("csrftoken");
-      setIsLoading(true);
-      
-      const response = await axios.post(
-        `https://gihozo.pythonanywhere.com/reply_to_message/${replyingTo.id}/`,
-        { reply: replyContent },  // Send as JSON object
-        { 
-          headers: { 
-            "X-CSRFToken": csrfToken, 
-            "Content-Type": "application/json"  // Crucial header
-          },
-          withCredentials: true
-        }
-      );
-  
+      setIsSending(true);
+      await messagesService.reply(replyingTo.id, replyContent);
+
       Swal.fire("Success", "Reply sent successfully!", "success");
       setReplyingTo(null);
       fetchMessages();
     } catch (error) {
-      console.error("Error sending reply:", error);
-      Swal.fire("Error", error.response?.data?.error || "Failed to send reply", "error");
+      Swal.fire("Error", getErrorMessage(error, "Failed to send reply"), "error");
     } finally {
-      setIsLoading(false);
+      setIsSending(false);
     }
   };
 

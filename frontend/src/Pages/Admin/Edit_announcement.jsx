@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { announcementsService, toFormData, getErrorMessage } from '../../api';
 
 const Edit_announcement = () => {
   const { id } = useParams();
@@ -11,39 +11,29 @@ const Edit_announcement = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("📢 Fetching:", `https://gihozo.pythonanywhere.com/edit_announcement/${id}/`);
-    
-    axios.get(`https://gihozo.pythonanywhere.com/edit_announcement/${id}/`, { withCredentials: true }) // ✅ Remove extra slash
-      .then((res) => {
-        console.log("✅ Data received:", res.data);
-        setAnnouncement(res.data);
-      })
-      .catch((error) => console.error("❌ Error fetching data:", error.response?.data || error));
+    announcementsService.getForEdit(id)
+      .then(setAnnouncement)
+      .catch((error) => setMessage(getErrorMessage(error)));
   }, [id]);
   
   
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent the default form submission
-    const formdata = new FormData();
-    formdata.append('title', announcement.title);
-    formdata.append('description', announcement.text); // Use text field for description
-
-    // Send POST request to update the announcement
-    axios.post(`https://gihozo.pythonanywhere.com/edit_announcement/${id}/`, formdata, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true
-      })
-    .then((response) => {
-        console.log('Announcement updated successfully', response.data);
-      setMessage("✅ Announcement updated successfully!");
-      Swal.fire("updated","Announcement has been edited","success")
-      navigate('/admin/announcement'); // Navigate back to the list of announcements
-    })
-    .catch((error) => {
-      console.error('Error updating announcement', error);
-      setMessage("❌ Error updating announcement.");
+    const formdata = toFormData({
+      title: announcement.title,
+      description: announcement.text, // Use text field for description
     });
+
+    announcementsService.update(id, formdata)
+      .then(() => {
+        setMessage("✅ Announcement updated successfully!");
+        Swal.fire("updated","Announcement has been edited","success")
+        navigate('/admin/announcement'); // Navigate back to the list of announcements
+      })
+      .catch((error) => {
+        setMessage(`❌ ${getErrorMessage(error, 'Error updating announcement.')}`);
+      });
   };
 
   if (!announcement) {

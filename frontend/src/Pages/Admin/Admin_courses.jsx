@@ -1,52 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from 'axios';
+import { usersService, getErrorMessage } from '../../api';
+import { useFetch } from '../../hooks';
 
 const Admin_general_info = () => {
-    const [general_info, setGeneralInfo] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem('access_token');
-                const response = await axios.get(
-                    "https://gihozo.pythonanywhere.com/api/admin_all_generalinformation/", 
-                    {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }
-                );
-                setGeneralInfo(response.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
+    const { data: general_info, loading: isLoading } = useFetch(
+        usersService.allGeneralInformation,
+        [],
+        []
+    );
 
     const handleDownloadSingleUserInfo = async (userId) => {
         try {
-            const token = localStorage.getItem('access_token');
-            const response = await axios.get(
-                `https://gihozo.pythonanywhere.com/api/download_single_user_info/${userId}/`,
-                {
-                    responseType: 'blob',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }
-            );
-            
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `user_${userId}_info.pdf`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            await usersService.downloadUserInfo(userId, `user_${userId}_info.pdf`);
         } catch (error) {
-            console.error("Download failed:", error);
+            alert(getErrorMessage(error, 'Download failed.'));
         }
     };
 

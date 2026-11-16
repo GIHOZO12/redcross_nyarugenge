@@ -1,25 +1,16 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
-import axios from 'axios';
+import { leadersService } from '../api';
+import { useFetch } from '../hooks';
 
 const Leader = () => {
-  const [leader, setLeader] = useState([]);
-
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/leaders")
-      .then((response) => {
-        setLeader(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching leaders", error);
-      });
-  }, []);
+  const { data: leader } = useFetch(leadersService.list, [], []);
 
   return (
     <div className="relative bg-gray-100 p-6 rounded-lg shadow-lg max-w-7xl mx-auto">

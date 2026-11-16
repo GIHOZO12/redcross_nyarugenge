@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { activitiesService, authService, getErrorMessage } from "../api";
 
 const Add_activities = () => {
   const { familyName } = useParams();
@@ -11,13 +11,10 @@ const Add_activities = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate =useNavigate()
-  const [csrfToken, setCsrfToken] = useState("");
 
-  // Fetch CSRF token from Django
+  // Prime Django's `csrftoken` cookie; the API client attaches the header itself.
   useEffect(() => {
-     axios.get("https://gihozo.pythonanywhere.com/get-csrf-token/", { withCredentials: true })
-       .then((res) => setCsrfToken(res.data.csrfToken))
-      .catch((err) => console.error("CSRF token error:", err));
+    authService.fetchCsrfToken();
   }, []);
 
   const handleOnSubmit = async (e) => {
@@ -35,32 +32,22 @@ const Add_activities = () => {
     formData.append("activity_image", activityImage);  // Ensure key names match backend
   
     try {
-      const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/create_activity/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "X-CSRFToken": csrfToken,  // Include CSRF token
-          },
-          withCredentials: true,  // Allow cookies to be sent with the request
-        }
-      );
-  
-      if (response.data.status) {
-        setSuccess("Activity added successfully!");
-        navigate(response.data.redirect_url);
+      const data = await activitiesService.create(formData);
 
-        setActivityName("");
-        setActivityText("");
-        setActivityImage(null);
-        setError("");
-      } else {
-        setError(response.data.message);
+      if (data?.status === false) {
+        setError(data.message || "Error adding activity");
+        return;
       }
+
+      setSuccess("Activity added successfully!");
+      setActivityName("");
+      setActivityText("");
+      setActivityImage(null);
+      setError("");
+
+      if (data?.redirect_url) navigate(data.redirect_url);
     } catch (error) {
-      console.error("Error adding activity", error);
-      setError("Error adding activity");
+      setError(getErrorMessage(error, "Error adding activity"));
     }
   };
 

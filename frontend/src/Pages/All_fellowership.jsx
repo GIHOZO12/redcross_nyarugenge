@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { fellowshipService } from '../api';
+import { useFetch } from '../hooks';
 
 const formatExactTimeDifference = (dateString) => {
   // Parse the date string as UTC (force timezone consistency)
@@ -22,18 +23,9 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const AllFellowship = () => {
-  const [allFellowship, setAllFellowship] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    axios.get('https://gihozo.pythonanywhere.com/all_fellowships/')
-      .then((response) => {
-        setAllFellowship(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching data', error);
-      });
-  }, []);
+  const { data: allFellowship } = useFetch(fellowshipService.all, [], []);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);

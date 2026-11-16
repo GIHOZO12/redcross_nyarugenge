@@ -1,5 +1,6 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { announcementsService } from "../api";
+import { useFetch } from "../hooks";
 import { motion } from "framer-motion";
 
 const formatExactTimeDifference = (dateString) => {
@@ -22,17 +23,9 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const Announcements = () => {
-  const [details, setDetails] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/announcement_list/")
-      .then((response) => {
-        setDetails(response.data);
-      }).catch((error) => {
-        console.error("error fetching announcement data", error);
-      });
-  }, []);
+  const { data: details } = useFetch(announcementsService.list, [], []);
 
   const handleSearchchange = (e) => {
     setSearchQuery(e.target.value);

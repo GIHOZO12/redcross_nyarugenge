@@ -1,20 +1,10 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
+import { usersService } from '../../api';
+import { useFetch } from '../../hooks';
 
 const Adminuser = () => {
-  const [users, setUsers] = React.useState([]);
-
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/users_info/")
-      .then((response) => {
-        console.log(response.data);
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const { data: users } = useFetch(usersService.list, [], []);
 
   return (
     <AdminLayout>

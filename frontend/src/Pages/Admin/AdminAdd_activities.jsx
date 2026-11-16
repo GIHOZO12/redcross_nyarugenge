@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from "axios";
+import { activitiesService, toFormData, getErrorMessage } from "../../api";
 
 const AddActivity = () => {
   const [activity, setActivity] = useState({ title: '', description: '', image: null });
@@ -18,45 +18,19 @@ const AddActivity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const data = new FormData();
-    data.append("title", activity.title);
-    data.append("description", activity.description);
-    data.append("redcross_activities_image", activity.image);
-  
     try {
-      const csrfToken = getCookie("csrftoken");
-      console.log("CSRF token:", csrfToken);
-  
-      const response = await axios.post("https://gihozo.pythonanywhere.com/admin/addactivities/", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "X-CSRFToken": csrfToken,
-        },
-        withCredentials: true,
-      });
-  
-      setMessage(response.data.message);
+      const data = await activitiesService.adminCreate(toFormData({
+        title: activity.title,
+        description: activity.description,
+        redcross_activities_image: activity.image,
+      }));
+
+      setMessage(data?.message || 'Activity added successfully.');
       setActivity({ title: '', description: '', image: null });
     } catch (error) {
-      console.error("Error adding activity:", error);
-      setMessage("Error adding activity");
+      setMessage(getErrorMessage(error, 'Error adding activity'));
     }
   };
-
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
 
   return (
     <AdminLayout>

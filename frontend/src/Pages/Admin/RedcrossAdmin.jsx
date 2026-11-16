@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { usersService } from '../../api';
+import { useFetch } from '../../hooks';
 
 const RedcrossAdmin = () => {
-  const [data, setData] = useState({ family: 0, member: 0, activities: 0 });
-
-  useEffect(() => {
-    axios.get("https://gihozo.pythonanywhere.com/admin_info/")
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data", error);
-      });
-  }, []);
+  const { data } = useFetch(usersService.adminDashboard, [], {
+    family: 0,
+    member: 0,
+    activities: 0,
+  });
 
   return (
     <AdminLayout>

@@ -1,41 +1,29 @@
 import React, { useState } from 'react';
+import { usersService, toFormData, getErrorMessage } from '../../api';
 
 const Navdata = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [profilePic, setProfilePic] = useState(null);
+  const [status, setStatus] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const formData = new FormData();
-    formData.append('first_name', firstName);
-    formData.append('last_name', lastName);
-    if (profilePic) {
-      formData.append('profile_image', profilePic);
-    }
-  
+    const formData = toFormData({
+      first_name: firstName,
+      last_name: lastName,
+      profile_image: profilePic,
+    });
+
     try {
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/add_user_info/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,  // Include the access token
-        },
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Profile updated successfully:', data);
-        setFirstName('')
-        setLastName('')
-        setProfilePic(null)
-      } else {
-        const errorData = await response.json();
-        console.error('Failed to update profile:', errorData);
-      }
+      await usersService.addUserInfo(formData);
+      setFirstName('')
+      setLastName('')
+      setProfilePic(null)
+      setStatus({ ok: true, text: 'Profile updated successfully.' });
     } catch (error) {
-      console.error('Error:', error);
+      setStatus({ ok: false, text: getErrorMessage(error, 'Failed to update profile.') });
     }
   };
   return (
@@ -44,6 +32,18 @@ const Navdata = () => {
         <h2 className='text-2xl font-bold text-gray-800 mb-6 text-center'>
           Complete Your Profile
         </h2>
+        {status && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm ${
+              status.ok
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }`}
+          >
+            {status.text}
+          </div>
+        )}
+
         <form className='space-y-6' onSubmit={handleSubmit}>
           {/* First Name Field */}
           <div>

@@ -1,85 +1,19 @@
-import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../AppContext/Appcontext";
-import Swal from "sweetalert2";
+import { FAMILIES } from "../api";
+import { useFamilyPage } from "../hooks";
 
 const UnitFamily = () => {
-  const [familyData, setFamilyData] = useState(null);
-  const [activities, setActivities] = useState([]);
-  const [error, setError] = useState(null);
   const { user } = useContext(AppContext); // Get the authenticated user from context
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchFamilyData = async () => {
-      try {
-        const familyResponse = await axios.get(
-          "https://gihozo.pythonanywhere.com/family_list/unit/"
-        );
-        setFamilyData(familyResponse.data.family);
-
-        const activitiesResponse = await axios.get(
-          "https://gihozo.pythonanywhere.com/family_activities/unit/"
-        );
-        setActivities(activitiesResponse.data.activities);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Unable to fetch family data or activities.");
-      }
-    };
-
-    fetchFamilyData();
-  }, []);
+  const { familyData, activities, error, handleDeleteActivity } = useFamilyPage(
+    FAMILIES.UNIT
+  );
 
   // Check if the authenticated user is the father or mother of the family
   const isFatherOrMother = user?.role === "Father" || user?.role === "Mother";
-
-  const handleDeleteActivity = async (id) => {
-    const csrfToken = getCookie("csrftoken");
-
-    if (!id) {
-      console.error("Activity ID is undefined");
-      setError("Invalid activity ID.");
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const response = await axios.delete(
-          `https://gihozo.pythonanywhere.com/family_delete_activity/${id}/`,
-          {
-            headers: {
-              "X-CSRFToken": csrfToken,
-            },
-            withCredentials: true,
-          }
-        );
-
-        if (response.data.status) {
-          setActivities((prevActivities) =>
-            prevActivities.filter((activity) => activity.id !== id)
-          );
-          Swal.fire("Deleted", "Deleted successfully", "success");
-        } else {
-          setError(response.data.message);
-        }
-      } catch (error) {
-        console.error("Error deleting activity:", error);
-        setError("Error deleting activity.");
-      }
-    }
-  };
 
   if (error) {
     return (

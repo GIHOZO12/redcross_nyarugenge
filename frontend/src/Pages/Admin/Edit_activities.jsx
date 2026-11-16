@@ -1,23 +1,8 @@
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../Layout/AdminLayout";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+import { activitiesService, toFormData, getErrorMessage } from "../../api";
 
 const Edit_activities = () => {
     const navigate = useNavigate();
@@ -29,52 +14,33 @@ const Edit_activities = () => {
     });
     const [message, setMessage] = useState("");
     useEffect(() => {
-        axios.get(`https://gihozo.pythonanywhere.com/edit_activity/${id}`, {
-            withCredentials: true  
-        })
-        .then((res) => {
-            setActivities(res.data);
-        })
-        .catch((error) => {
-            console.error("❌ Error fetching activity:", error);
-            setMessage("Error fetching activity data");
-        });
+        activitiesService.getForEdit(id)
+            .then(setActivities)
+            .catch((error) => {
+                setMessage(getErrorMessage(error, "Error fetching activity data"));
+            });
     }, [id]);
 
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        const data = new FormData();
-        data.append("title", activities.title);
-        data.append("description", activities.description);
-
-        if (activities.redcross_activities_image) {
-            data.append("redcross_activities_image", activities.redcross_activities_image);
-        }
-
-        
-        axios.post(
-            `https://gihozo.pythonanywhere.com/edit_activity/${id}`,
-            data,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "X-CSRFToken": getCookie("csrftoken")  
-                },
-                withCredentials: true, 
-            }
-        )
-        .then((res) => {
-            console.log("✅ Response:", res.data);
-            setMessage("Activity edited successfully");
-            Swal.fire("Updated!", "Activity has been updated successfully.", "success");
-            navigate("/admin/activities");
-        })
-        .catch((error) => {
-            console.error("❌ Error:", error);
-            setMessage("Error editing activity");
-            Swal.fire("Error", "Error editing activity", "error");
+        const data = toFormData({
+            title: activities.title,
+            description: activities.description,
+            redcross_activities_image: activities.redcross_activities_image,
         });
+
+        activitiesService.saveEdit(id, data)
+            .then(() => {
+                setMessage("Activity edited successfully");
+                Swal.fire("Updated!", "Activity has been updated successfully.", "success");
+                navigate("/admin/activities");
+            })
+            .catch((error) => {
+                const text = getErrorMessage(error, "Error editing activity");
+                setMessage(text);
+                Swal.fire("Error", text, "error");
+            });
     };
 
     return (

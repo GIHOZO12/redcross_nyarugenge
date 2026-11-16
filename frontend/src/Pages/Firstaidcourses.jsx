@@ -1,22 +1,12 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom"; // ✅ Import React Router for navigation
+import { coursesService } from "../api";
+import { useFetch } from "../hooks";
 
 const Firstaidcourses = () => {
-  const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    axios
-      .get("https://gihozo.pythonanywhere.com/first-aid_course/")
-      .then((response) => {
-        console.log("API Response:", response.data);
-        setCourses(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching courses:", error);
-      });
-  }, []);
+  const { data: courses } = useFetch(coursesService.firstAidList, [], []);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);

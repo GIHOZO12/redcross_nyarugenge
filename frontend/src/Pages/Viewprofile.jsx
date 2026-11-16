@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { refreshToken, isTokenExpired } from '../Components/auth';
 import User_info from './Profile/User_info';
 import { AppContext } from '../AppContext/Appcontext';
+import { authService, membershipService, mediaUrl, getErrorMessage } from '../api';
 
 const Viewprofile = () => {
   const [Profile, setProfile] = useState(null);
@@ -26,29 +26,12 @@ const Viewprofile = () => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('access_token');
-    const formData = new FormData();
-    formData.append('profile_image', changeprofilepicture.profile_image);
-
     try {
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/change_profile_picture/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Profile picture updated successfully:', data);
-        setchangeprofilepicture(false);
-        fetchCurrentUser();
-      } else {
-        console.error('Failed to update profile picture');
-      }
+      await authService.changeProfilePicture(changeprofilepicture.profile_image);
+      setchangeprofilepicture(false);
+      fetchCurrentUser();
     } catch (error) {
-      console.error('Error updating profile picture:', error);
+      alert(getErrorMessage(error, 'Failed to update profile picture'));
     }
   };
 
@@ -56,76 +39,33 @@ const Viewprofile = () => {
     e.preventDefault();
     console.log("Submit request button clicked"); // Debugging step 1
 
-    const token = localStorage.getItem('access_token');
-    if (!token) {
+    if (!localStorage.getItem('access_token')) {
         alert('Please log in first');
         return;
     }
 
     try {
         setRequestStatus('loading');
-        console.log("Sending request with message:", requestMessage); // Debugging step 2
-
-        const response = await fetch('https://gihozo.pythonanywhere.com/api/request_membership/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: requestMessage }),
-        });
-
-        const data = await response.json();
-        console.log("API Response:", data); // Debugging step 3
-
-        if (!response.ok) {
-            throw new Error(data.detail || 'Request failed');
-        }
+        await membershipService.request({ message: requestMessage });
 
         setRequestStatus('success');
         setShowRequestForm(false);
         setRequestMessage('');
         fetchCurrentUser();
-        
     } catch (error) {
-        console.error('Request failed:', error);
         setRequestStatus('error');
-        alert(`Error: ${error.message}`);
+        alert(getErrorMessage(error, 'Request failed'));
     }
 };
 
 
+  // The API client refreshes an expired access token and retries on its own.
   const fetchCurrentUser = async () => {
-    let token = localStorage.getItem('access_token');
-
-    if (token && isTokenExpired(token)) {
-      console.log('Token expired. Refreshing token...');
-      token = await refreshToken();
-      if (!token) {
-        console.error('Failed to refresh token. Redirecting to login...');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        return;
-      }
-    }
-
     try {
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/current_user/', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Profile Data:', data);
-        setProfile(data);
-      } else {
-        console.error('Failed to fetch current user');
-      }
+      const data = await authService.getCurrentUser();
+      if (data) setProfile(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', getErrorMessage(error));
     }
   };
 
@@ -142,7 +82,7 @@ const Viewprofile = () => {
             <div className='flex flex-col sm:flex-row justify-between items-center'>
               <div>
                 <img
-                  src={Profile.profile_image ? `https://gihozo.pythonanywhere.com/${Profile.profile_image}` : '../assets/logo.png'}
+                  src={mediaUrl(Profile.profile_image, '../assets/logo.png')}
                   alt='profile_pic'
                   className='w-20 h-20 mx-auto mb-5 rounded-full'
                   onError={(e) => {

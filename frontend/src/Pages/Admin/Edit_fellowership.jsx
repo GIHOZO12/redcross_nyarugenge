@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate, useParams } from 'react-router-dom';
+import { fellowshipService, toFormData, getErrorMessage } from '../../api';
 
 const EditFellowership = () => {
   const navigate=useNavigate()
@@ -11,14 +11,9 @@ const EditFellowership = () => {
   const [message, setMessage] = useState(""); // ✅ Add a success message state
 
   useEffect(() => {
-    console.log("📢 Fetching:", `https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`);
-    
-    axios.get(`https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`)
-      .then((res) => {
-        console.log("✅ Data received:", res.data);
-        setFellowership(res.data);
-      })
-      .catch((error) => console.error("❌ Error fetching data:", error.response?.data || error));
+    fellowshipService.getForEdit(id)
+      .then(setFellowership)
+      .catch((error) => setMessage(getErrorMessage(error)));
   }, [id]);
   
 
@@ -30,25 +25,21 @@ const EditFellowership = () => {
   const updateFellowship = (e) => {
     e.preventDefault();
   
-    const formData = new FormData();
-    formData.append("title", fellowership.title);
-    formData.append("description", fellowership.description);
-    if (fellowership.image instanceof File) {
-      formData.append("fellowership_image", fellowership.image);
-    }
-  
-    console.log("📤 Sending update to:", `https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`);
-    console.log("📦 Payload:", [...formData.entries()]);
-  
-    axios.post(`https://gihozo.pythonanywhere.com/admin_edit_fellowship/${id}/`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-    .then((res) => {
-      console.log("✅ Success:", res.data);
-      Swal.fire("Updated!", "Fellowship has been edited.", "success")
-      navigate("/admin/myfelowership")
-    })
-    .catch((error) => console.error("❌ Update error:", error.response?.data || error));
+    const formData = toFormData({
+      title: fellowership.title,
+      description: fellowership.description,
+      fellowership_image:
+        fellowership.image instanceof File ? fellowership.image : undefined,
+    });
+
+    fellowshipService.update(id, formData)
+      .then(() => {
+        Swal.fire("Updated!", "Fellowship has been edited.", "success")
+        navigate("/admin/myfelowership")
+      })
+      .catch((error) => {
+        Swal.fire("Error", getErrorMessage(error, "Error editing fellowship"), "error");
+      });
   };
 
   return (

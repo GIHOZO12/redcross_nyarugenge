@@ -1,6 +1,7 @@
 import React from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
+import { fellowshipService } from '../api';
+import { useFetch } from '../hooks';
 
 const formatExactTimeDifference = (dateString) => {
   const pastDate = new Date(dateString + 'Z'); // Force UTC
@@ -22,13 +23,7 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const Latest = () => {
-  const [latest, setLatest] = React.useState([]);
-
-  React.useEffect(() => {
-    axios.get('https://gihozo.pythonanywhere.com/latest_fellowership/')
-      .then(response => setLatest(response.data))
-      .catch(error => console.error("Error fetching data:", error));
-  }, []);
+  const { data: latest } = useFetch(fellowshipService.latest, [], []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

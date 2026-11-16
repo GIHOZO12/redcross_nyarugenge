@@ -1,41 +1,37 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import { session, SESSION_EXPIRED_EVENT } from "../api";
 
 export const AppContext = createContext();
 
+const EMPTY_USER = {
+  is_authenticated: false,
+  username: "",
+  is_superuser: false,
+  is_staff: false,
+  role: "",
+};
+
 const AppContextProvider = ({ children }) => {
-  const [user, setUser] = useState({
-    is_authenticated: false,
-    username: "",
-    is_superuser: false,
-    is_staff: false,
-    role:'',
-  });
+  const [user, setUser] = useState(EMPTY_USER);
 
   const [showlogin, setshowlogin] = useState(null);
   const [showpayment, setshowpayment] = useState(null);
   const [resetpassword, setresetpassword] = useState(null);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const access_token = localStorage.getItem("access_token");
-    const username = localStorage.getItem("username");
-    const is_superuser = localStorage.getItem("is_superuser") === "true";
-    const is_staff = localStorage.getItem("is_staff") === "true";
-    const role = localStorage.getItem("role");
+    // Restore the session from storage. The API client reads the token itself,
+    // so there is no axios default header to set here any more.
+    setUser(session.getUser());
 
-    if (access_token && username) {
-      setUser({
-        is_authenticated: true,
-        username,
-        is_superuser,
-        is_staff,
-        role,
-      });
+    // When a refresh token finally expires, `api/client.js` clears storage and
+    // fires this event: drop the user and open the login modal.
+    const handleExpired = () => {
+      setUser(EMPTY_USER);
+      setshowlogin(true);
+    };
 
-      // Set axios Authorization header
-      axios.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-    }
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleExpired);
   }, []);
 
   return (

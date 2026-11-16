@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie'
+import React from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { activitiesService, getErrorMessage } from '../../api';
+import { useFetch } from '../../hooks';
 
 const Adminactivities = () => {
-  const [activities, setActivities] = useState([]);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    axios
-      .get('https://gihozo.pythonanywhere.com/admin_activities/')
-      .then((response) => {
-        setActivities(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const { data: activities, setData: setActivities } = useFetch(
+    activitiesService.adminList,
+    [],
+    []
+  );
 
   const deleteActivity = (id) => {
     if (!id) {
@@ -35,21 +28,17 @@ const Adminactivities = () => {
       confirmButtonText: 'Yes, delete it',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`https://gihozo.pythonanywhere.com/admin/delete_activity/${id}`,{
-          headers:{
-          "X-CSRFToken": Cookies.get("csrftoken"),
-          },
-          withCredentials:true,
-        })
-          .then((response) => {
-            if (response.data.status) {
-              setActivities(activities.filter((item) => item.id !== id));
-              Swal.fire('Deleted!', 'Activity deleted successfully.', 'success');
+        activitiesService.adminDelete(id)
+          .then((data) => {
+            if (data && data.status === false) {
+              Swal.fire('Error!', data.message || 'Delete failed.', 'error');
+              return;
             }
+            setActivities((current) => current.filter((item) => item.id !== id));
+            Swal.fire('Deleted!', 'Activity deleted successfully.', 'success');
           })
           .catch((error) => {
-            console.log('Error deleting activity:', error);
-            Swal.fire('Error!', 'Something went wrong.', 'error');
+            Swal.fire('Error!', getErrorMessage(error), 'error');
           });
       }
     });

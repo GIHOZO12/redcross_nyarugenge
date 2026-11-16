@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
 import { FaEnvelope, FaLock, FaTimes, FaUser } from "react-icons/fa";
 import { AppContext } from "../AppContext/Appcontext";
-import axios from "axios";
+import { authService, getErrorMessage } from "../api";
 import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 import { ClipLoader } from "react-spinners"; // Import a loading spinner
-import { useNavigate } from "react-router-dom";
 
 const Join = () => {
   const [state, setState] = useState("login"); // Tracks the form state ('login' or 'register')
@@ -20,39 +19,16 @@ const Join = () => {
     e.preventDefault();
     setLoading(true); // Start loading
     try {
-      const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/api/login/",
-        {
-          email,
-          password,
-        }
-      );
-
-      const { access, role, refresh, username, is_superuser, is_staff } =
-        response.data;
-
-      // Store tokens in localStorage
-      localStorage.setItem("access_token", access);
-      localStorage.setItem("refresh_token", refresh);
-      localStorage.setItem("username", username);
-      localStorage.setItem("is_superuser", is_superuser);
-      localStorage.setItem("is_staff", is_staff);
-      localStorage.setItem("role", role);
-      console.log("Role saved to local storage:", role);
-
-      // Set refresh_token in cookies
-      document.cookie = `refresh_token=${refresh}; path=/; secure; SameSite=None`;
-
-      // Set axios Authorization header
-      axios.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      // The service stores the tokens, role flags and refresh cookie.
+      const data = await authService.login({ email, password });
 
       // Update user state
       setUser({
         is_authenticated: true,
-        username: response.data.username,
-        is_superuser: true,
-        is_staff: true,
-        role: response.data.role,
+        username: data.username,
+        is_superuser: data.is_superuser,
+        is_staff: data.is_staff,
+        role: data.role,
       });
 
       // Hide login modal
@@ -61,7 +37,7 @@ const Join = () => {
       // Redirect after login
       window.location.href = "/";
     } catch (error) {
-      setMessage(error.response?.data?.message || "Login failed");
+      setMessage(getErrorMessage(error, "Login failed"));
     } finally {
       setLoading(false); // Stop loading
     }
@@ -71,32 +47,21 @@ const Join = () => {
     e.preventDefault();
     setLoading(true); // Start loading
     try {
-      const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/api/register/",
-        {
-          username,
-          email,
-          password,
-        }
-      );
-  
+      await authService.register({ username, email, password });
+
       // If registration is successful
       setMessage("Registration successful! Please log in.");
       setState("login"); // Switch to the login form after successful registration
     } catch (error) {
       // Handle specific error messages from the API
-      if (error.response) {
-        const { data } = error.response;
-  
-        if (data.username) {
-          setMessage("Username is already taken. Please choose a different one.");
-        } else if (data.email) {
-          setMessage("Email is already registered. Please use a different email.");
-        } else {
-          setMessage("Registration failed. Please try again.");
-        }
+      const data = error.response?.data;
+
+      if (data?.username) {
+        setMessage("Username is already taken. Please choose a different one.");
+      } else if (data?.email) {
+        setMessage("Email is already registered. Please use a different email.");
       } else {
-        setMessage("Registration failed. Please check your connection and try again.");
+        setMessage(getErrorMessage(error, "Registration failed. Please try again."));
       }
     } finally {
       setLoading(false); // Stop loading

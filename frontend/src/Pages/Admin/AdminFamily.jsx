@@ -1,19 +1,10 @@
-import React, { useEffect } from 'react'
-import { useState } from'react'
-import axios from 'axios'
+import React from 'react'
 import AdminLayout from '../../Layout/AdminLayout'
+import { familyService } from '../../api'
+import { useFetch } from '../../hooks'
 
 const AdminFamily = () => {
-    const [family, setFamily] = useState([])
-    useEffect(()=>{
-        axios.get("https://gihozo.pythonanywhere.com/admin_family/")
-        .then((response)=>{
-            setFamily(response.data)
-        }).catch((error)=>{
-            console.error("error fetching family",error)
-        })
-
-    },[])
+    const { data: family } = useFetch(familyService.adminList, [], [])
     return (
         <AdminLayout>
           <div className="p-6 bg-white rounded-lg shadow-md">

@@ -1,6 +1,6 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import { newsletterService, getErrorMessage } from '../api';
 
 const Getintouch = () => {
   const [subscribe, setSubscribe] = useState({ email: '' });
@@ -11,21 +11,6 @@ const Getintouch = () => {
     const { name, value } = e.target;
     setSubscribe({ ...subscribe, [name]: value });
   };
-
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,35 +23,21 @@ const Getintouch = () => {
 
     setIsLoading(true);
     setMessage('');
-    
-    const data = new FormData();
-    data.append('email', subscribe.email);
 
     try {
-      const csrfToken = getCookie('csrftoken');
-      const response = await axios.post(
-        "https://gihozo.pythonanywhere.com/add_email_toseubscribenewsletter/", 
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "X-CSRFToken": csrfToken
-          }
-        }
-      );
-      
-      if (response.data.status === 'already_subscribed') {
+      const data = await newsletterService.subscribe(subscribe.email);
+
+      if (data?.status === 'already_subscribed') {
         setMessage('This email is already subscribed to our newsletter');
       } else {
         setMessage('Thank you for subscribing to our newsletter!');
         setSubscribe({ email: '' });
       }
     } catch (error) {
-      console.error("Error while subscribing to newsletter", error);
-      if (error.response && error.response.data && error.response.data.error === 'already_subscribed') {
+      if (error.response?.data?.error === 'already_subscribed') {
         setMessage('This email is already subscribed to our newsletter');
       } else {
-        setMessage('An error occurred. Please try again.');
+        setMessage(getErrorMessage(error));
       }
     } finally {
       setIsLoading(false);

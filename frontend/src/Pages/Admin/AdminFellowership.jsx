@@ -1,23 +1,18 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from "react";
+import React from "react";
 import AdminLayout from "../../Layout/AdminLayout";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { fellowshipService, getErrorMessage } from "../../api";
+import { useFetch } from "../../hooks";
 
 const AdminFellowership = () => {
     const navigate = useNavigate();
-    const [fellowership, setFellowership] = useState([]);
-
-    useEffect(() => {
-        axios.get("https://gihozo.pythonanywhere.com/admin_fellowships/")
-            .then((response) => {
-                setFellowership(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
+    const { data: fellowership, setData: setFellowership } = useFetch(
+        fellowshipService.adminList,
+        [],
+        []
+    );
 
     // Delete function with confirmation popup
     const handleDelete = (id) => {
@@ -36,16 +31,13 @@ const AdminFellowership = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`https://gihozo.pythonanywhere.com/admin_deleter_fellowship/${id}/`)
-                    .then((response) => {
-                        if (response.data.status) {
-                            setFellowership(fellowership.filter(item => item.id !== id));
-                            Swal.fire("Deleted!", "Fellowship has been deleted.", "success");
-                        }
+                fellowshipService.adminDelete(id)
+                    .then(() => {
+                        setFellowership((current) => current.filter(item => item.id !== id));
+                        Swal.fire("Deleted!", "Fellowship has been deleted.", "success");
                     })
                     .catch((error) => {
-                        console.error("Delete error:", error);
-                        Swal.fire("Error!", "Something went wrong.", "error");
+                        Swal.fire("Error!", getErrorMessage(error), "error");
                     });
             }
         });

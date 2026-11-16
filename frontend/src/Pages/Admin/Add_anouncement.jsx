@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../Layout/AdminLayout';
-import axios from 'axios';
+import { announcementsService, toFormData, getErrorMessage } from '../../api';
 
 const Add_anouncement = () => {
   const [announcement, setAnnouncement] = useState({ title: '', text: '' });
@@ -14,41 +14,17 @@ const Add_anouncement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = new FormData();
-    data.append('title', announcement.title);
-    data.append('text', announcement.text);
-
     try {
-      const response = await axios.post("https://gihozo.pythonanywhere.com/admin_add_announcement/", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "X-CSRFToken": getCookie("csrftoken"),  // ✅ Ensure CSRF token is sent
-        }
-      });
+      const data = await announcementsService.create(
+        toFormData({ title: announcement.title, text: announcement.text })
+      );
 
-      setMessage(response.data.message);
+      setMessage(data?.message || 'Announcement added successfully.');
       setAnnouncement({ title: '', text: '' });
     } catch (error) {
-      console.error("❌ Error adding announcement:", error.response?.data || error);
-      setMessage("❌ Error adding announcement");
+      setMessage(getErrorMessage(error, 'Error adding announcement'));
     }
   };
-
-  // ✅ Function to get CSRF token from cookies
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
 
   return (
     <AdminLayout>

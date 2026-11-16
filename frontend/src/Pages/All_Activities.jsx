@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { activitiesService } from '../api';
+import { useFetch } from '../hooks';
 
 const formatExactTimeDifference = (dateString) => {
   // Parse the date string as UTC (force timezone consistency)
@@ -22,18 +23,9 @@ const formatExactTimeDifference = (dateString) => {
 };
 
 const All_Activities = () => {
-  const [all_activities, setAllactivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    axios.get('https://gihozo.pythonanywhere.com/All_activities/')
-      .then((response) => {
-        setAllactivities(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching data', error);
-      });
-  }, []);
+  const { data: all_activities } = useFetch(activitiesService.all, [], []);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value)

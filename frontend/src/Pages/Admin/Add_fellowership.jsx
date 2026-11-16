@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import AdminLayout from '../../Layout/AdminLayout';
+import { fellowshipService, authService, toFormData, getErrorMessage } from '../../api';
 
 const AddFellowship = () => {
     const [formData, setFormData] = useState({ title: '', description: '', fellowership_image: null });
     const [message, setMessage] = useState('');
-    const [csrfToken, setCsrfToken] = useState('');
 
+    // Prime Django's `csrftoken` cookie; the API client attaches the header itself.
     useEffect(() => {
-        axios.get("https://gihozo.pythonanywhere.com/get_csrf_token/", { withCredentials: true })
-            .then(response => {
-                setCsrfToken(response.data.csrfToken);
-                console.log("CSRF Token received:", response.data.csrfToken);
-            })
-            .catch(error => console.error("Error fetching CSRF Token:", error));
+        authService.fetchCsrfToken();
     }, []);
 
     const handleChange = (e) => {
@@ -27,26 +22,17 @@ const AddFellowship = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const data = new FormData();
-        data.append('title', formData.title);
-        data.append('description', formData.description);
-        data.append('fellowership_image', formData.fellowership_image);
-
         try {
-            const response = await axios.post("https://gihozo.pythonanywhere.com/add_fellowship/", data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "X-CSRFToken": csrfToken,
-                },
-                withCredentials: true,
-            });
+            const data = await fellowshipService.create(toFormData({
+                title: formData.title,
+                description: formData.description,
+                fellowership_image: formData.fellowership_image,
+            }));
 
-            setMessage(response.data.message);
+            setMessage(data?.message || 'Fellowship added successfully.');
             setFormData({ title: '', description: '', fellowership_image: null });
-
         } catch (error) {
-            console.error("Error adding fellowship", error);
-            setMessage("Error adding fellowship");
+            setMessage(getErrorMessage(error, 'Error adding fellowship'));
         }
     };
 

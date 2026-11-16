@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { activitiesService, toFormData, getErrorMessage } from "../api";
 
 const Update_activity = () => {
     const { id } = useParams();
@@ -14,44 +14,37 @@ const Update_activity = () => {
     const [message, setMessage] = useState("");
 
     useEffect(() => {
-        axios.get(`https://gihozo.pythonanywhere.com/update_activity/${id}/`)
-            .then((res) => {
-                console.log(res.data);
+        activitiesService.getForUpdate(id)
+            .then((data) => {
                 // Map backend keys to frontend keys
-                const activityData = {
-                    title: res.data.activity.title,
-                    text: res.data.activity.text,
-                    activity_image: res.data.activity.activityImage, // Map activityImage to activity_image
-                };
-                setActivity(activityData);
+                setActivity({
+                    title: data.activity.title,
+                    text: data.activity.text,
+                    activity_image: data.activity.activityImage, // Map activityImage to activity_image
+                });
             })
             .catch((error) => {
-                console.error("Error fetching activity data", error);
+                setMessage(getErrorMessage(error, "Error fetching activity data"));
             });
     }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formdata = new FormData();
-        formdata.append("title", activity.title);
-        formdata.append("text", activity.text);
-        formdata.append("activity_image", activity.activity_image);
-
-        axios.post(`https://gihozo.pythonanywhere.com/update_activity/${id}/`, formdata, {
-            withCredentials: true,
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        })
-        .then((res) => {
-            console.log(res.data);
-            setMessage("Activity updated successfully");
-            Swal.fire("Updated", "Activity updated successfully", "success");
-            navigate(res.data.redirect_url);
-        })
-        .catch((error) => {
-            console.error("Error updating activity", error);
+        const formdata = toFormData({
+            title: activity.title,
+            text: activity.text,
+            activity_image: activity.activity_image,
         });
+
+        activitiesService.update(id, formdata)
+            .then((data) => {
+                setMessage("Activity updated successfully");
+                Swal.fire("Updated", "Activity updated successfully", "success");
+                if (data?.redirect_url) navigate(data.redirect_url);
+            })
+            .catch((error) => {
+                setMessage(getErrorMessage(error, "Error updating activity"));
+            });
     };
 
     return (

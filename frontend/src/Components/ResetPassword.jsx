@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { authService, getErrorMessage } from '../api';
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');
@@ -20,27 +21,16 @@ const ResetPassword = () => {
     }
 
     try {
-      // Simulate API call to reset password
-      const response = await fetch('https://gihozo.pythonanywhere.com/api/reset_password/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, new_password: newPassword, confirm_password: confirmPassword }),
+      const data = await authService.resetPassword({
+        email,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message);
-        setIsError(false);
-      } else {
-        setMessage(data.message || 'An error occurred');
-        setIsError(true);
-      }
+      setMessage(data?.message || 'Your password has been reset.');
+      setIsError(false);
     } catch (error) {
-      setMessage('An error occurred. Please try again.');
-      console.log(error);
+      setMessage(getErrorMessage(error));
       setIsError(true);
     }
   };
