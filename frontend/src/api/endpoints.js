@@ -69,7 +69,7 @@ export const endpoints = {
 
   family: {
     adminList: "/admin_family/",
-    /** Members of one family, e.g. "Humanity", "unit", "neutrality". */
+    /** Members of one family, e.g. "Humanity", "unity", "neutrality". */
     list: (family) => `/family_list/${family}/`,
     /** Activities of one family. */
     activities: (family) => `/family_activities/${family}/`,
@@ -124,7 +124,7 @@ export const endpoints = {
 /** The family slugs the backend recognises, kept here so pages don't hardcode typos. */
 export const FAMILIES = {
   HUMANITY: "Humanity",
-  UNIT: "unit",
+  UNITY: "unity",
   NEUTRALITY: "neutrality",
   IMPARTIALITY: "impartiality",
   UNIVERSALITY: "universality",

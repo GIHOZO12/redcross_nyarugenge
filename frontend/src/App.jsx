@@ -56,7 +56,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
-  // ✅ Page loading effect
+
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
@@ -65,7 +65,7 @@ const App = () => {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  // ✅ Google Translate Integration
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://cdn.gtranslate.net/widgets/latest/float.js";
@@ -121,7 +121,12 @@ const App = () => {
                 <Route path="/Viewprofile" element={<Viewprofile />} />
                 
                 <Route path="/Courses" element={<Firstaidcourses />} />
-                <Route path="/families/unit" element={<UnitFamily />} />
+                <Route path="/families/unity" element={<UnitFamily />} />
+                {/* Renamed from "unit"; keep old links and bookmarks working. */}
+                <Route
+                  path="/families/unit"
+                  element={<Navigate to="/families/unity" replace />}
+                />
                 <Route path="/families/impartiality" element={<Impartiality />} />
                 {/* Old misspelled path, kept so existing links and bookmarks still work. */}
                 <Route

@@ -14,7 +14,7 @@ const UnitFamily = () => {
     canAddActivity,
     handleDeleteActivity,
   } = useFamilyPage(
-    FAMILIES.UNIT
+    FAMILIES.UNITY
   );
 
 
@@ -43,7 +43,7 @@ const UnitFamily = () => {
           </h1>
           {/* Add Activity Button - Only visible to father or mother */}
           {canAddActivity && (
-            <Link to="/addactivities/unit">
+            <Link to="/addactivities/unity">
               <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">
                 Add activity
               </button>

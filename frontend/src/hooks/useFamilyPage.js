@@ -6,7 +6,7 @@
  * Each page now keeps only its own markup:
  *
  *   const { familyData, activities, error, handleDeleteActivity } =
- *     useFamilyPage(FAMILIES.UNIT);
+ *     useFamilyPage(FAMILIES.UNITY);
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
