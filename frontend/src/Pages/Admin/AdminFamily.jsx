@@ -19,7 +19,7 @@ const AdminFamily = () => {
             <table className="min-w-full table-auto border-collapse">
               <thead>
                 <tr className="bg-blue-900 text-white">
-                  <th className="px-4 py-2 border-b">ID</th>
+
                   <th className="px-4 py-2 border-b">Name</th>
                   <th className="px-4 py-2 border-b">Father</th>
                   <th className="px-4 py-2 border-b">Mother</th>
@@ -31,7 +31,7 @@ const AdminFamily = () => {
               <tbody>
                 {family.map((item, index) => (
                   <tr key={index} className="border-b hover:bg-gray-100">
-                    <td className="px-4 py-2">{item.id}</td>
+
                     <td className="px-4 py-2">{item.name}</td>
                     
                     <td className="px-4 py-2">{item.father}</td>

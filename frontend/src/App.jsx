@@ -107,7 +107,7 @@ const App = () => {
         <Route path="/admin/messages" element={<AdminMessage />} />
         <Route path="/subscibe_newslatter" element={<Subscribenewsletter />} />
 
-        {/* Non-Admin Routes */}
+     
         <Route
           path="/*"
           element={
@@ -122,13 +122,13 @@ const App = () => {
                 
                 <Route path="/Courses" element={<Firstaidcourses />} />
                 <Route path="/families/unity" element={<UnitFamily />} />
-                {/* Renamed from "unit"; keep old links and bookmarks working. */}
+
                 <Route
                   path="/families/unit"
                   element={<Navigate to="/families/unity" replace />}
                 />
                 <Route path="/families/impartiality" element={<Impartiality />} />
-                {/* Old misspelled path, kept so existing links and bookmarks still work. */}
+
                 <Route
                   path="/families/partiarity"
                   element={<Navigate to="/families/impartiality" replace />}
