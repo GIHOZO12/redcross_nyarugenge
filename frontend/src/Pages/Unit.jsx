@@ -1,19 +1,22 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AppContext } from "../AppContext/Appcontext";
 import { FAMILIES } from "../api";
 import { useFamilyPage } from "../hooks";
 
 const UnitFamily = () => {
-  const { user } = useContext(AppContext); // Get the authenticated user from context
   const navigate = useNavigate();
 
-  const { familyData, activities, error, handleDeleteActivity } = useFamilyPage(
+  const {
+    familyData,
+    activities,
+    error,
+    // Server-side answer for THIS family: its own father/mother, or staff.
+    canAddActivity,
+    handleDeleteActivity,
+  } = useFamilyPage(
     FAMILIES.UNIT
   );
 
-  // Check if the authenticated user is the father or mother of the family
-  const isFatherOrMother = user?.role === "Father" || user?.role === "Mother";
 
   if (error) {
     return (
@@ -39,7 +42,7 @@ const UnitFamily = () => {
             {familyData.name} Family
           </h1>
           {/* Add Activity Button - Only visible to father or mother */}
-          {isFatherOrMother && (
+          {canAddActivity && (
             <Link to="/addactivities/unit">
               <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">
                 Add activity
@@ -78,7 +81,7 @@ const UnitFamily = () => {
                     {new Date(activity.created).toLocaleString()}
                   </p>
                   {/* Edit and Delete Buttons - Only visible to father or mother */}
-                  {isFatherOrMother && (
+                  {canAddActivity && (
                     <div className="flex justify-end p-2 gap-3">
                       <button
                         onClick={() => handleDeleteActivity(activity.id)}

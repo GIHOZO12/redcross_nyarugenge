@@ -15,7 +15,6 @@ const AppContextProvider = ({ children }) => {
   const [user, setUser] = useState(EMPTY_USER);
 
   const [showlogin, setshowlogin] = useState(null);
-  const [showpayment, setshowpayment] = useState(null);
   const [resetpassword, setresetpassword] = useState(null);
 
   useEffect(() => {
@@ -41,10 +40,8 @@ const AppContextProvider = ({ children }) => {
         setUser,
         setshowlogin,
         showlogin,
-        showpayment,
         resetpassword,
         setresetpassword,
-        setshowpayment,
       }}
     >
       {children}

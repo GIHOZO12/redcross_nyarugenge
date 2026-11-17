@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useContext, useEffect, useState } from "react"; 
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import Home from "./Pages/Home";
@@ -11,7 +11,7 @@ import UnitFamily from "./Pages/Unit";
 import Humanity_family from "./Pages/Humanity";
 import Neutrality from "./Pages/Neutrality";
 import Universality from "./Pages/universality";
-import Partiality from "./Pages/Partiality";
+import Impartiality from "./Pages/Impartiality";
 import Activitiesadd from "./Pages/Activitiesadd";
 import RedcrossAdmin from "./Pages/Admin/RedcrossAdmin";
 import Adminuser from "./Pages/Admin/Adminuser";
@@ -35,7 +35,6 @@ import Edit_announcement from "./Pages/Admin/Edit_announcement";
 import Edit_activities from "./Pages/Admin/Edit_activities";
 import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
-import Payment from "./Components/Payment";
 import Update_activity from "./Pages/Update_activity";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
 import Confirmmbership from "./Pages/Admin/Confirmmbership";
@@ -53,7 +52,6 @@ const Loadingspinner = () => (
 
 const App = () => {
   const { showlogin } = useContext(AppContext);
-  const { showpayment } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -114,17 +112,20 @@ const App = () => {
             <>
               <Navbar />
               {showlogin && <Join />}
-              {showpayment && <Payment />}
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/update" element={<Anouncement />} />
                 <Route path="/ideas" element={<Ideas />} />
                 <Route path="/Viewprofile" element={<Viewprofile />} />
-                <Route path="/payment" element={<Payment />} />
                 
                 <Route path="/Courses" element={<Firstaidcourses />} />
                 <Route path="/families/unit" element={<UnitFamily />} />
-                <Route path="/families/partiarity" element={<Partiality />} />
+                <Route path="/families/impartiality" element={<Impartiality />} />
+                {/* Old misspelled path, kept so existing links and bookmarks still work. */}
+                <Route
+                  path="/families/partiarity"
+                  element={<Navigate to="/families/impartiality" replace />}
+                />
                 <Route path="/families/Humanity" element={<Humanity_family />} />
                 <Route path="/families/neutrality" element={<Neutrality />} />
                 <Route path="/event/fellowership" element={<All_fellowership />} />

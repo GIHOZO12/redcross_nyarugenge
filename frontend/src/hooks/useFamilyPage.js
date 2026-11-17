@@ -1,5 +1,5 @@
 /**
- * Everything the five family pages (Humanity, Unit, Neutrality, Partiality,
+ * Everything the five family pages (Humanity, Unit, Neutrality, Impartiality,
  * Universality) used to repeat: load the family, load its activities, and
  * delete an activity behind a confirmation dialog.
  *
@@ -23,6 +23,19 @@ export const useFamilyPage = (family) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * May the signed-in user manage THIS family's activities?
+   *
+   * The server decides and returns `can_add_activity`. It compares the caller
+   * against this family's own father/mother (both OneToOne fields, so a parent
+   * belongs to exactly one family) and lets staff through everywhere.
+   *
+   * Deciding it here from the user's role would be wrong: a role of "Father"
+   * is global, so every parent would see the controls on every family's page,
+   * and the server would then refuse the request with 403.
+   */
+  const [canAddActivity, setCanAddActivity] = useState(false);
+
   const mounted = useRef(true);
 
   useEffect(() => {
@@ -45,9 +58,19 @@ export const useFamilyPage = (family) => {
       if (!mounted.current) return;
       setFamilyData(familyResponse?.family ?? familyResponse ?? null);
       setActivities(activitiesResponse?.activities ?? activitiesResponse ?? []);
+      // `/family_list/` nests the flag inside `family`; `/family_activities/`
+      // returns it at the top level. Take whichever is present.
+      setCanAddActivity(
+        Boolean(
+          familyResponse?.family?.can_add_activity ??
+            activitiesResponse?.can_add_activity ??
+            false
+        )
+      );
     } catch (err) {
       if (mounted.current) {
         setError(getErrorMessage(err, "Unable to fetch family data or activities."));
+        setCanAddActivity(false);
       }
     } finally {
       if (mounted.current) setLoading(false);
@@ -98,6 +121,8 @@ export const useFamilyPage = (family) => {
     activities,
     loading,
     error,
+    /** True only for this family's own father/mother, or for staff. */
+    canAddActivity,
     handleDeleteActivity,
     refetch: load,
     setActivities,

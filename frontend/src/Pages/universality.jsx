@@ -1,14 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AppContext } from "../AppContext/Appcontext";
 import { FAMILIES } from "../api";
 import { useFamilyPage } from "../hooks";
 
 const Universality = () => {
-  const {user}=useContext(AppContext)
   const naviage=useNavigate()
 
-  const { familyData, activities, error, handleDeleteActivity } = useFamilyPage(
+  const {
+    familyData,
+    activities,
+    error,
+    // Server-side answer for THIS family: its own father/mother, or staff.
+    canAddActivity,
+    handleDeleteActivity,
+  } = useFamilyPage(
     FAMILIES.UNIVERSALITY
   );
 
@@ -28,7 +33,6 @@ const Universality = () => {
     );
   }
 
-  const isFatherOrMother = user?.role === "Father" || user?.role === "Mother";
  
 
 
@@ -40,7 +44,7 @@ const Universality = () => {
      
       <header className="text-center mb-8">
         <div className="flex justify-center items-center mt-20 gap-14">
-      {isFatherOrMother &&(
+      {canAddActivity &&(
      <Link to="/addactivities/universality">  <button className="bg-black hover:bg-black hover:scale-[1.1] text-white font-bold py-2 px-4 rounded">Add activity</button></Link>
     )}
         </div>
@@ -72,7 +76,7 @@ const Universality = () => {
                   <p className="text-sm text-gray-400 mt-4">
                {new Date(activity.created).toLocaleString()}
                   </p>
-                  {isFatherOrMother &&(
+                  {canAddActivity &&(
                   <div className="flex justify-end p-2  gap-3">
                   <button onClick={()=>handleDeleteActivity(activity.id)} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors ">Delete</button>
                   <button onClick={()=>naviage(`/update_activity/${activity.id}/`)} className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors mr-2 ">Edit</button>

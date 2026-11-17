@@ -14,7 +14,6 @@ const Navbar = () => {
   const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { setshowlogin, user = {}, setUser } = useContext(AppContext);
-  const { setshowpayment } = useContext(AppContext);
   const [profileImage, setProfileImage] = useState(null);
   
    // State to store profile image
@@ -35,25 +34,22 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      // Blacklists the refresh token on the backend, then clears local session.
-      await authService.logout();
+    // Best effort on the server, guaranteed locally: `logout()` clears the
+    // session whether or not the backend call succeeds, so the user is always
+    // signed out here rather than being shown an error and left logged in.
+    await authService.logout();
 
-      // Update user state in context
-      setUser({
-        is_authenticated: false,
-        username: null,
-        is_superuser: false,
-        is_staff: false,
-        role: null,
-      });
+    // Update user state in context
+    setUser({
+      is_authenticated: false,
+      username: null,
+      is_superuser: false,
+      is_staff: false,
+      role: null,
+    });
 
-      // Redirect to homepage
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Error logging out:", error);
-      alert("An error occurred during logout. Please try again.");
-    }
+    // Redirect to homepage
+    window.location.href = "/";
   };
 
   const dropdownVariants = {
@@ -140,9 +136,9 @@ const Navbar = () => {
                       Neutrality
                     </li>
                   </Link>
-                  <Link to="/families/partiarity" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/families/impartiality" onClick={() => setIsMobileMenuOpen(false)}>
                     <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
-                      Partiality
+                      Impartiality
                     </li>
                   </Link>
                   <Link to="/families/unit" onClick={() => setIsMobileMenuOpen(false)}>
@@ -208,12 +204,6 @@ const Navbar = () => {
             <Link to="/ideas" onClick={() => setIsMobileMenuOpen(false)}>
               <li className="text-white cursor-pointer hover:text-gray-300">
                 Ideas Box
-              </li>
-            </Link>
-
-            <Link to="" onClick={() => setshowpayment(true)}>
-              <li className="text-white cursor-pointer hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>
-                Donate
               </li>
             </Link>
 

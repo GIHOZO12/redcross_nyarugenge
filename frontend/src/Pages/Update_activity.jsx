@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { activitiesService, toFormData, getErrorMessage } from "../api";
@@ -33,7 +33,14 @@ const Update_activity = () => {
         const formdata = toFormData({
             title: activity.title,
             text: activity.text,
-            activity_image: activity.activity_image,
+            // Only send the image when a new file was picked. `activity_image`
+            // is loaded from the API as the current image's URL, and posting
+            // that string back would arrive as a text field rather than an
+            // upload - the server would see no file and reject the request.
+            activity_image:
+                activity.activity_image instanceof File
+                    ? activity.activity_image
+                    : undefined,
         });
 
         activitiesService.update(id, formdata)
@@ -52,6 +59,19 @@ const Update_activity = () => {
             <header>
                 <h1>Update Activity</h1>
             </header>
+            {/* The page tracked this message but never rendered it, so a failed
+                update looked like nothing happened at all. */}
+            {message && (
+                <div
+                    className={`w-full max-w-md mb-4 p-3 rounded-md text-sm ${
+                        message.includes("success")
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                    }`}
+                >
+                    {message}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-col w-full max-w-md p-4 bg-white rounded-md">
                     <label>Title</label>

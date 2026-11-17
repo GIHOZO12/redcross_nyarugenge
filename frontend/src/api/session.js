@@ -53,6 +53,23 @@ export const session = {
 
   setAccessToken: (token) => write(KEYS.access, token),
 
+  /**
+   * Store a rotated refresh token.
+   *
+   * The backend runs SIMPLE_JWT with ROTATE_REFRESH_TOKENS and
+   * BLACKLIST_AFTER_ROTATION, so every refresh issues a new refresh token and
+   * blacklists the one just used. Dropping the new one would leave us holding
+   * a blacklisted token and log the user out on the next refresh.
+   */
+  setRefreshToken: (token) => {
+    if (!token) return;
+    write(KEYS.refresh, token);
+    const secure = window.location.protocol === "https:";
+    document.cookie = `${REFRESH_COOKIE}=${token}; path=/; ${
+      secure ? "secure; SameSite=None" : "SameSite=Lax"
+    }`;
+  },
+
   /** Persist a successful login response. */
   save({ access, refresh, username, is_superuser, is_staff, role }) {
     write(KEYS.access, access);
@@ -97,12 +114,19 @@ export const session = {
   },
 };
 
-/** True when a JWT's `exp` claim is in the past (or it cannot be decoded). */
-export const isTokenExpired = (token) => {
+/**
+ * True when a JWT's `exp` claim has passed (or it cannot be decoded).
+ *
+ * @param {string|null} token
+ * @param {number} [skewSeconds] treat the token as expired this many seconds
+ *   early, covering clock drift and slow requests. A large upload is rejected
+ *   against the token's state when it *arrives*, not when it was sent.
+ */
+export const isTokenExpired = (token, skewSeconds = 0) => {
   if (!token) return true;
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.exp * 1000 < Date.now();
+    return payload.exp * 1000 - skewSeconds * 1000 < Date.now();
   } catch {
     return true;
   }

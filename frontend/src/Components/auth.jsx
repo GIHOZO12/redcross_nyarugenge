@@ -32,6 +32,8 @@ export const refreshToken = async () => {
     );
     if (!data?.access) return null;
     session.setAccessToken(data.access);
+    // Refresh-token rotation is enabled server side; keep the new one.
+    session.setRefreshToken(data.refresh);
     return data.access;
   } catch (error) {
     console.error("Failed to refresh token", error);

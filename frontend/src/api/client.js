@@ -17,9 +17,18 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config/env";
 import { endpoints } from "./endpoints";
-import { session, getCookie } from "./session";
+import { session, getCookie, isTokenExpired } from "./session";
 
 const SAFE_METHODS = ["get", "head", "options"];
+
+/**
+ * Refresh this many seconds before the access token actually expires.
+ *
+ * Access tokens live 10 minutes (SIMPLE_JWT.ACCESS_TOKEN_LIFETIME) and a slow
+ * upload can be in flight for a while, so a token that is merely "about to
+ * expire" is treated as expired.
+ */
+const REFRESH_SKEW_SECONDS = 60;
 
 /**
  * CSRF token held in memory.
@@ -46,12 +55,69 @@ const api = axios.create({
 });
 
 /* ------------------------------------------------------------------ *
+ * Access-token refresh, shared by both interceptors
+ * ------------------------------------------------------------------ */
+
+// Shared promise so ten parallel requests trigger exactly one refresh call.
+let refreshPromise = null;
+
+const refreshAccessToken = async () => {
+  const refresh = session.getRefreshToken();
+  if (!refresh) return null;
+
+  try {
+    const { data } = await axios.post(
+      `${API_BASE_URL}${endpoints.auth.refreshToken}`,
+      { refresh },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    if (!data?.access) return null;
+    session.setAccessToken(data.access);
+    // Rotation is on, so the response carries a fresh refresh token and the
+    // one we just sent is now blacklisted. Keep the new one or the next
+    // refresh fails and the user is signed out mid-session.
+    session.setRefreshToken(data.refresh);
+    return data.access;
+  } catch {
+    return null;
+  }
+};
+
+/** Run at most one refresh at a time, whoever asks for it. */
+const refreshOnce = async () => {
+  refreshPromise = refreshPromise || refreshAccessToken();
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
+};
+
+/* ------------------------------------------------------------------ *
  * Request: attach auth + CSRF, let axios set multipart boundaries
  * ------------------------------------------------------------------ */
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   if (!config.skipAuth) {
-    const token = session.getAccessToken();
+    let token = session.getAccessToken();
+
+    // Refresh *before* sending rather than reacting to the rejection.
+    //
+    // DRF checks permissions before it reads the request body, so an expired
+    // token makes the server answer immediately and close the connection while
+    // the browser is still uploading. The browser reports that as
+    // ERR_HTTP2_PROTOCOL_ERROR with no response attached, so there is no 401
+    // or 403 left to retry on - and nothing is written to the server's access
+    // log either. Verified against the deployed backend: a 500KB body to an
+    // IsAuthenticated endpoint is reset mid-flight, while the same body to an
+    // endpoint that reads it returns a clean response.
+    // Also covers a missing access token while a refresh token is still held,
+    // which otherwise sends the request with no credentials at all.
+    const needsRefresh = !token || isTokenExpired(token, REFRESH_SKEW_SECONDS);
+    if (needsRefresh && session.getRefreshToken()) {
+      token = (await refreshOnce()) || token;
+    }
+
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -74,43 +140,49 @@ api.interceptors.request.use((config) => {
  * Response: refresh the access token once, then replay the request
  * ------------------------------------------------------------------ */
 
-// Shared promise so ten parallel 401s trigger exactly one refresh call.
-let refreshPromise = null;
+/**
+ * Is this failure "your token is no good" rather than "you may not do that"?
+ *
+ * DRF answers an expired or missing token with **403, not 401**, because
+ * SessionAuthentication sits first in DEFAULT_AUTHENTICATION_CLASSES and its
+ * `authenticate_header()` returns None, which makes DRF fall back to 403.
+ * Access tokens live 10 minutes (SIMPLE_JWT.ACCESS_TOKEN_LIFETIME), so without
+ * this every authenticated request starts failing ten minutes after login
+ * instead of quietly refreshing.
+ *
+ * Matched on the two bodies DRF produces for authentication failure; a genuine
+ * permission denial carries neither, so it is never retried.
+ */
+const isAuthFailure = (response) => {
+  if (!response) return false;
+  if (response.status === 401) return true;
+  if (response.status !== 403) return false;
 
-const refreshAccessToken = async () => {
-  const refresh = session.getRefreshToken();
-  if (!refresh) return null;
-
-  try {
-    const { data } = await axios.post(
-      `${API_BASE_URL}${endpoints.auth.refreshToken}`,
-      { refresh },
-      { headers: { "Content-Type": "application/json" } }
-    );
-    if (!data?.access) return null;
-    session.setAccessToken(data.access);
-    return data.access;
-  } catch {
-    return null;
-  }
+  const data = response.data;
+  if (!data || typeof data !== "object") return false;
+  return (
+    data.code === "token_not_valid" ||
+    data.detail === "Authentication credentials were not provided."
+  );
 };
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config || {};
-    const status = error.response?.status;
 
     const canRetry =
-      status === 401 && !config._retried && !config.skipAuth && !config.skipAuthRefresh;
+      isAuthFailure(error.response) &&
+      Boolean(session.getRefreshToken()) &&
+      !config._retried &&
+      !config.skipAuth &&
+      !config.skipAuthRefresh;
 
     if (!canRetry) return Promise.reject(error);
 
     config._retried = true;
 
-    refreshPromise = refreshPromise || refreshAccessToken();
-    const newToken = await refreshPromise;
-    refreshPromise = null;
+    const newToken = await refreshOnce();
 
     if (!newToken) {
       session.expire(); // storage cleared + `redcross:session-expired` fired

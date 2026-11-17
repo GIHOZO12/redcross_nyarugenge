@@ -19,11 +19,24 @@ export const authService = {
   register: ({ username, email, password }) =>
     post(endpoints.auth.register, { username, email, password }, { skipAuth: true }),
 
-  /** Tell the backend to blacklist the refresh token, then clear storage. */
+  /**
+   * Blacklist the refresh token on the backend, then clear local storage.
+   *
+   * Never rejects. Blacklisting is a courtesy to the server; what actually
+   * logs the user out is dropping the tokens here. If the call fails - an
+   * expired access token comes back 403, the backend is asleep, the network
+   * is down - the user must still end up logged out rather than stuck in a
+   * signed-in UI being told to try again.
+   */
   async logout() {
     const refresh = session.getRefreshToken();
     try {
       if (refresh) await post(endpoints.auth.logout, { refresh });
+    } catch (error) {
+      console.warn(
+        "Logout request failed; clearing the local session anyway.",
+        error?.response?.status ?? error?.message ?? error
+      );
     } finally {
       session.clear();
     }

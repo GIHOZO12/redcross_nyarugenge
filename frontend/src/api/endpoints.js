@@ -114,7 +114,7 @@ export const FAMILIES = {
   HUMANITY: "Humanity",
   UNIT: "unit",
   NEUTRALITY: "neutrality",
-  PARTIALITY: "partiarity",
+  IMPARTIALITY: "impartiality",
   UNIVERSALITY: "universality",
 };
 
