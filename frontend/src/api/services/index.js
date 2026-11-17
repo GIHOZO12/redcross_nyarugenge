@@ -3,6 +3,7 @@ export { usersService } from "./users.service";
 export { membershipService } from "./membership.service";
 export { activitiesService } from "./activities.service";
 export { familyService } from "./family.service";
+export { familyAdminService } from "./familyAdmin.service";
 export { fellowshipService } from "./fellowship.service";
 export { announcementsService } from "./announcements.service";
 export { messagesService, MESSAGE_FILTERS } from "./messages.service";

@@ -12,5 +12,6 @@ export { default as api } from "./client";
 export { get, post, put, patch, remove, getBlob, downloadFile, toFormData, setCsrfToken, getCsrfToken } from "./client";
 export { endpoints, FAMILIES } from "./endpoints";
 export { mediaUrl } from "./media";
+export { isFamilyOfficer, OFFICER_ROLES } from "./roles";
 export { session, isTokenExpired, getCookie, SESSION_EXPIRED_EVENT } from "./session";
 export { getErrorMessage, getFieldErrors, isUnauthorized, isNotFound } from "./errors";

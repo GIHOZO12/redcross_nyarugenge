@@ -37,6 +37,7 @@ import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Update_activity from "./Pages/Update_activity";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
+import FamilyManage from "./Pages/Admin/FamilyManage";
 import Confirmmbership from "./Pages/Admin/Confirmmbership";
 import NotFound from "./Pages/Note_found";
 
@@ -96,6 +97,7 @@ const App = () => {
         <Route path="/admin/edit_fellowership/:id" element={<Edit_fellowership />} />
         <Route path="/admin/add_fellowership" element={<Add_fellowership />} />
         <Route path="/admin/redcrossfamilies" element={<AdminFamily />} />
+        <Route path="/admin/families/:id" element={<FamilyManage />} />
         <Route path="/admin/announcement" element={<Admin_announcement />} />
         <Route path="/edit_announcement/:id" element={<Edit_announcement />} />
         <Route path="confirm_membership" element={<Confirmmbership />} />

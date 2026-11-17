@@ -55,6 +55,18 @@ export const endpoints = {
     update: (id) => `/update_activity/${id}/`,
   },
 
+  /**
+   * Committee family administration (President / Vice President / Secretary).
+   * Unlike the other admin routes these require an authenticated officer.
+   */
+  familyAdmin: {
+    overview: "/family_admin/families/",
+    detail: (id) => `/family_admin/families/${id}/`,
+    assignParent: (id) => `/family_admin/families/${id}/assign_parent/`,
+    addChild: (id) => `/family_admin/families/${id}/children/`,
+    assignableUsers: "/family_admin/assignable_users/",
+  },
+
   family: {
     adminList: "/admin_family/",
     /** Members of one family, e.g. "Humanity", "unit", "neutrality". */
