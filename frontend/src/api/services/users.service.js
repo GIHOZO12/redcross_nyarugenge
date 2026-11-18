@@ -24,12 +24,31 @@ export const usersService = {
   /** Save the short profile (names, phone, ...) from the profile tab. */
   addUserInfo: (payload) => post(endpoints.users.addUserInfo, payload),
 
-  /** @returns {Promise<boolean>} true when the national ID is already taken. */
+  /**
+   * Is this national ID already registered?
+   *
+   * A courtesy check so the form can flag the problem next to the field
+   * instead of failing on save. It never blocks submission: if the check
+   * itself fails - offline, endpoint missing, server asleep - this answers
+   * "not taken" and lets the request through, because `nationalId` is unique
+   * in the database and that is what actually enforces it. Throwing here
+   * would stop a member registering over a failed *optional* lookup.
+   *
+   * @returns {Promise<boolean>} true only when the ID is known to be taken.
+   */
   async isNationalIdTaken(nationalId) {
-    const data = await get(endpoints.users.checkNationalId, {
-      params: { nationalId },
-    });
-    return Boolean(data?.exists ?? data?.is_taken ?? false);
+    try {
+      const data = await get(endpoints.users.checkNationalId, {
+        params: { nationalId },
+      });
+      return Boolean(data?.exists ?? data?.is_taken ?? false);
+    } catch (error) {
+      console.warn(
+        "National ID check unavailable; the server will validate on save.",
+        error?.response?.status ?? error?.message ?? error
+      );
+      return false;
+    }
   },
 
   downloadUserInfo: (userId, filename = `member-${userId}.pdf`) =>
