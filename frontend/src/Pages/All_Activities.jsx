@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import { activitiesService } from '../api';
 import { useFetch } from '../hooks';
@@ -81,10 +82,16 @@ const All_Activities = () => {
                   <span className='text-dark font-semibold'>Title: </span>
                   {item.title}
                 </h2>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm line-clamp-3">
                   <span className='text-dark font-semibold'>Short message: </span>
                   {item.description}
                 </p>
+                <Link
+                  to={`/activity/${item.id}`}
+                  className="inline-block mt-3 text-sm font-semibold text-red-600 hover:text-red-800"
+                >
+                  View details &rarr;
+                </Link>
               </div>
             </div>
           ))}

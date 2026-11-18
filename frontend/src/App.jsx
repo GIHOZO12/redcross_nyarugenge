@@ -37,6 +37,8 @@ import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Update_activity from "./Pages/Update_activity";
 import FamilyActivityDetail from "./Pages/FamilyActivityDetail";
+import FellowshipDetail from "./Pages/FellowshipDetail";
+import ActivityDetail from "./Pages/ActivityDetail";
 import AdminFellowshipDetail from "./Pages/Admin/AdminFellowshipDetail";
 import AdminActivityDetail from "./Pages/Admin/AdminActivityDetail";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
@@ -142,8 +144,10 @@ const App = () => {
                 <Route path="/families/neutrality" element={<Neutrality />} />
                 <Route path="/event/fellowership" element={<All_fellowership />} />
                 <Route path="/event/allactivities" element={<All_Activities />} />
-                {/* Family activities keep a public detail page; fellowships and
-                    Red Cross activities are read in the admin dashboard. */}
+                {/* Public, read-only detail pages. Editing and image uploads
+                    live in the admin dashboard. */}
+                <Route path="/fellowship/:id" element={<FellowshipDetail />} />
+                <Route path="/activity/:id" element={<ActivityDetail />} />
                 <Route path="/family-activity/:id" element={<FamilyActivityDetail />} />
                 <Route path="/families/universality" element={<Universality />} />
 
