@@ -26,11 +26,18 @@ const DetailArticle = ({
 
       <article className="bg-white rounded-lg shadow-lg overflow-hidden mt-4">
         {image && (
-          <img
-            src={image}
-            alt={title}
-            className="w-full h-72 sm:h-96 object-cover"
-          />
+          // object-contain, not cover: these are photos of boards, notes and
+          // group shots, and cropping them to a fixed box cuts off exactly the
+          // part worth seeing. The neutral backdrop fills whatever the aspect
+          // ratio leaves over, and max-h keeps a tall image from filling the
+          // screen on its own.
+          <a href={image} target="_blank" rel="noreferrer" title="Open full size">
+            <img
+              src={image}
+              alt={title}
+              className="w-full max-h-[34rem] object-contain bg-gray-100"
+            />
+          </a>
         )}
         <div className="p-6 sm:p-8">
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>

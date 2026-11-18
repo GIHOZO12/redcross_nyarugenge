@@ -49,19 +49,29 @@ const FellowshipDetail = () => {
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             What we learned
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Two across rather than three: these record what was taught, so
+              each one needs to be big enough to actually read. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {fellowship.gallery.map((item) => (
               <figure
                 key={item.id}
                 className="bg-white rounded-lg shadow overflow-hidden"
               >
-                <img
-                  src={item.image}
-                  alt={item.caption || fellowship.title}
-                  className="w-full h-48 object-cover"
-                />
+                <a
+                  href={item.image}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Open full size"
+                >
+                  {/* object-contain so nothing is cropped away */}
+                  <img
+                    src={item.image}
+                    alt={item.caption || fellowship.title}
+                    className="w-full max-h-[26rem] min-h-[18rem] object-contain bg-gray-100"
+                  />
+                </a>
                 {item.caption && (
-                  <figcaption className="p-3 text-sm text-gray-700">
+                  <figcaption className="p-4 text-base text-gray-700">
                     {item.caption}
                   </figcaption>
                 )}

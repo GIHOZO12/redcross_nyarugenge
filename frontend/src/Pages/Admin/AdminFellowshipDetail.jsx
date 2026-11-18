@@ -99,12 +99,16 @@ const AdminFellowshipDetail = () => {
         </Link>
 
         <article className="bg-white rounded-lg shadow mt-4 overflow-hidden">
+          {/* object-contain, not cover: cropping a photo of a board or a
+              group shot hides the part worth seeing. */}
           {fellowship.fellowship_image && (
-            <img
-              src={fellowship.fellowship_image}
-              alt={fellowship.title}
-              className="w-full h-64 object-cover"
-            />
+            <a href={fellowship.fellowship_image} target="_blank" rel="noreferrer" title="Open full size">
+              <img
+                src={fellowship.fellowship_image}
+                alt={fellowship.title}
+                className="w-full max-h-[32rem] object-contain bg-gray-100"
+              />
+            </a>
           )}
           <div className="p-6">
             <h1 className="text-2xl font-bold text-blue-900">{fellowship.title}</h1>
@@ -133,18 +137,21 @@ const AdminFellowshipDetail = () => {
               No images yet — add the first one below.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            // Two across, large enough to check what was actually uploaded.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {fellowship.gallery.map((item) => (
                 <figure
                   key={item.id}
                   className="bg-white rounded-lg shadow overflow-hidden flex flex-col"
                 >
-                  <img
-                    src={item.image}
-                    alt={item.caption || fellowship.title}
-                    className="w-full h-44 object-cover"
-                  />
-                  <figcaption className="p-3 text-sm text-gray-700 flex-1">
+                  <a href={item.image} target="_blank" rel="noreferrer" title="Open full size">
+                    <img
+                      src={item.image}
+                      alt={item.caption || fellowship.title}
+                      className="w-full max-h-[24rem] min-h-[16rem] object-contain bg-gray-100"
+                    />
+                  </a>
+                  <figcaption className="p-4 text-base text-gray-700 flex-1">
                     {item.caption || <span className="text-gray-400">No caption</span>}
                   </figcaption>
                   <button

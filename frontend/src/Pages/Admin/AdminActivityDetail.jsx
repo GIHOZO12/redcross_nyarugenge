@@ -53,12 +53,16 @@ const AdminActivityDetail = () => {
         </Link>
 
         <article className="bg-white rounded-lg shadow mt-4 overflow-hidden max-w-4xl">
+          {/* object-contain, not cover: cropping a photo of a board or a
+              group shot hides the part worth seeing. */}
           {activity.redcross_activities_image && (
-            <img
-              src={activity.redcross_activities_image}
-              alt={activity.title}
-              className="w-full h-64 object-cover"
-            />
+            <a href={activity.redcross_activities_image} target="_blank" rel="noreferrer" title="Open full size">
+              <img
+                src={activity.redcross_activities_image}
+                alt={activity.title}
+                className="w-full max-h-[32rem] object-contain bg-gray-100"
+              />
+            </a>
           )}
           <div className="p-6">
             <h1 className="text-2xl font-bold text-blue-900">{activity.title}</h1>
