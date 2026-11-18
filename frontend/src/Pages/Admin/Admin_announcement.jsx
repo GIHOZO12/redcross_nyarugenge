@@ -13,14 +13,13 @@ const Admin_announcement = () => {
         []
     );
 
-    // Delete announcement
+  
     const deleteAnnounce = (id) => {
         if (!id) {
-            console.error("❌ Error: Announcement ID is undefined");
+
             return;
         }
 
-        console.log("🛠️ Attempting to delete announcement with ID:", id);
 
         Swal.fire({
             title: "Are you sure?",

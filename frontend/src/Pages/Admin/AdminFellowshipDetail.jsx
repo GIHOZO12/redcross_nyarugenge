@@ -91,8 +91,7 @@ const AdminFellowshipDetail = () => {
         </Link>
 
         <article className="bg-white rounded-lg shadow mt-4 overflow-hidden">
-          {/* object-contain, not cover: cropping a photo of a board or a
-              group shot hides the part worth seeing. */}
+
           {fellowship.fellowship_image && (
             <a href={fellowship.fellowship_image} target="_blank" rel="noreferrer" title="Open full size">
               <img
@@ -105,7 +104,7 @@ const AdminFellowshipDetail = () => {
           <div className="p-6">
             <h1 className="text-2xl font-bold text-blue-900">{fellowship.title}</h1>
             <p className="text-sm text-gray-500 mt-1">{fellowship.created_at}</p>
-            {/* whitespace-pre-line so paragraph breaks in the description survive */}
+
             <p className="text-gray-700 mt-5 leading-relaxed whitespace-pre-line">
               {fellowship.description}
             </p>
@@ -118,7 +117,7 @@ const AdminFellowshipDetail = () => {
           </div>
         </article>
 
-        {/* What we learned ------------------------------------------------ */}
+
         <section className="mt-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             What we learned
@@ -129,7 +128,7 @@ const AdminFellowshipDetail = () => {
               No images yet — add the first one below.
             </p>
           ) : (
-            // Two across, large enough to check what was actually uploaded.
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {fellowship.gallery.map((item) => (
                 <figure
@@ -158,7 +157,7 @@ const AdminFellowshipDetail = () => {
           )}
         </section>
 
-        {/* Upload ---------------------------------------------------------- */}
+
         <section className="mt-8 bg-white rounded-lg shadow p-6 max-w-2xl">
           <h2 className="text-lg font-semibold mb-4">Add an image</h2>
           <form onSubmit={upload} className="space-y-4">
