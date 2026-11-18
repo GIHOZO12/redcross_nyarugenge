@@ -74,6 +74,12 @@ const Impartiality = () => {
                   <p className="text-sm text-gray-400 mt-4">
  {new Date(activity.created).toLocaleString()}
                   </p>
+                  <Link
+                    to={`/family-activity/${activity.id}`}
+                    className="inline-block mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
+                  >
+                    View details &rarr;
+                  </Link>
                   {canAddActivity &&(
                   <div className="flex justify-end p-2  gap-3">
                   <button onClick={()=>handleDeleteActivity(activity.id)} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors ">Delete</button>

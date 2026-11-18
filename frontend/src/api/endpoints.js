@@ -42,6 +42,8 @@ export const endpoints = {
 
   activities: {
     all: "/All_activities/",
+    /** Public detail page for a Red Cross activity. */
+    detail: (id) => `/redcross_activity/${id}/`,
     latest: "/latest_redcross_activities/",
     adminList: "/admin_activities/",
     create: "/create_activity/",
@@ -74,10 +76,17 @@ export const endpoints = {
     /** Activities of one family. */
     activities: (family) => `/family_activities/${family}/`,
     deleteActivity: (id) => `/family_delete_activity/${id}/`,
+    /** Public detail page for one family activity. */
+    activityDetail: (id) => `/family_activity/${id}/`,
   },
 
   fellowship: {
     all: "/all_fellowships/",
+    /** Public detail page, including the captioned gallery. */
+    detail: (id) => `/fellowship/${id}/`,
+    /** Officer/staff only. */
+    addImage: (id) => `/fellowship/${id}/images/`,
+    deleteImage: (imageId) => `/fellowship_image/${imageId}/`,
     latest: "/latest_fellowership/",
     adminList: "/admin_fellowships/",
     create: "/add_fellowship/",

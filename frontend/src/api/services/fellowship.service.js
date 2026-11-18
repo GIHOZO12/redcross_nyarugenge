@@ -1,10 +1,27 @@
 /** Fellowships: public listings and admin CRUD. */
 
-import { get, post, remove } from "../client";
+import { get, post, remove, toFormData } from "../client";
 import { endpoints } from "../endpoints";
 
 export const fellowshipService = {
   all: () => get(endpoints.fellowship.all),
+
+  /** One fellowship with its full description and captioned gallery. */
+  async detail(id) {
+    const data = await get(endpoints.fellowship.detail(id));
+    return data?.fellowship ?? null;
+  },
+
+  /**
+   * Attach a captioned image. Officer or staff only.
+   * @param {number} id
+   * @param {{image: File, caption?: string}} payload
+   */
+  addImage: (id, { image, caption }) =>
+    post(endpoints.fellowship.addImage(id), toFormData({ image, caption })),
+
+  /** Remove one gallery image, file included. Officer or staff only. */
+  deleteImage: (imageId) => remove(endpoints.fellowship.deleteImage(imageId)),
 
   latest: () => get(endpoints.fellowship.latest),
 

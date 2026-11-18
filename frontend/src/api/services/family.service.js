@@ -19,6 +19,12 @@ export const familyService = {
 
   deleteActivity: (id) => remove(endpoints.family.deleteActivity(id)),
 
+  /** One family activity with its full text. */
+  async activityDetail(id) {
+    const data = await get(endpoints.family.activityDetail(id));
+    return data?.activity ?? null;
+  },
+
   /** Members and activities in one round trip, for a family page's loader. */
   async overview(family) {
     const [members, activities] = await Promise.all([

@@ -80,6 +80,12 @@ const UnitFamily = () => {
                   <p className="text-sm text-gray-400 mt-4">
                     {new Date(activity.created).toLocaleString()}
                   </p>
+                  <Link
+                    to={`/family-activity/${activity.id}`}
+                    className="inline-block mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
+                  >
+                    View details &rarr;
+                  </Link>
                   {/* Edit and Delete Buttons - Only visible to father or mother */}
                   {canAddActivity && (
                     <div className="flex justify-end p-2 gap-3">

@@ -6,6 +6,12 @@ import { endpoints } from "../endpoints";
 export const activitiesService = {
   all: () => get(endpoints.activities.all),
 
+  /** One Red Cross activity with its full description. */
+  async detail(id) {
+    const data = await get(endpoints.activities.detail(id));
+    return data?.activity ?? null;
+  },
+
   latest: () => get(endpoints.activities.latest),
 
   adminList: () => get(endpoints.activities.adminList),

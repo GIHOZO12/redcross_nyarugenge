@@ -36,6 +36,8 @@ import Edit_activities from "./Pages/Admin/Edit_activities";
 import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Update_activity from "./Pages/Update_activity";
+import FellowshipDetail from "./Pages/FellowshipDetail";
+import ActivityDetail from "./Pages/ActivityDetail";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
 import FamilyManage from "./Pages/Admin/FamilyManage";
 import Confirmmbership from "./Pages/Admin/Confirmmbership";
@@ -137,6 +139,13 @@ const App = () => {
                 <Route path="/families/neutrality" element={<Neutrality />} />
                 <Route path="/event/fellowership" element={<All_fellowership />} />
                 <Route path="/event/allactivities" element={<All_Activities />} />
+                {/* Detail pages: the full description for one item. */}
+                <Route path="/fellowship/:id" element={<FellowshipDetail />} />
+                <Route path="/activity/:id" element={<ActivityDetail variant="redcross" />} />
+                <Route
+                  path="/family-activity/:id"
+                  element={<ActivityDetail variant="family" />}
+                />
                 <Route path="/families/universality" element={<Universality />} />
 
                 <Route path="/addactivities/:familyName" element={<Activitiesadd />} />

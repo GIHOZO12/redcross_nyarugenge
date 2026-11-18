@@ -23,4 +23,18 @@ export const OFFICER_ROLES = ["President", "Vice President", "Secretary"];
 export const isFamilyOfficer = (user) =>
   Boolean(user && OFFICER_ROLES.includes(user.role));
 
+/**
+ * May this user add or remove fellowship gallery images?
+ *
+ * Wider than `isFamilyOfficer` on purpose, and matching the server:
+ * restructuring families is a governance act, while posting photos of what a
+ * fellowship covered is ordinary admin work, so staff qualify here too.
+ *
+ * @param {{role?: string, is_staff?: boolean, is_superuser?: boolean}|null|undefined} user
+ */
+export const canEditFellowshipGallery = (user) =>
+  Boolean(
+    user && (user.is_staff || user.is_superuser || OFFICER_ROLES.includes(user.role))
+  );
+
 export default isFamilyOfficer;
