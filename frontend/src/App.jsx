@@ -36,8 +36,9 @@ import Edit_activities from "./Pages/Admin/Edit_activities";
 import AdminMessage from "./Pages/Admin/AdminMessage";
 import Subscribenewsletter from "./Pages/Admin/Subscribenewsletter";
 import Update_activity from "./Pages/Update_activity";
-import FellowshipDetail from "./Pages/FellowshipDetail";
-import ActivityDetail from "./Pages/ActivityDetail";
+import FamilyActivityDetail from "./Pages/FamilyActivityDetail";
+import AdminFellowshipDetail from "./Pages/Admin/AdminFellowshipDetail";
+import AdminActivityDetail from "./Pages/Admin/AdminActivityDetail";
 import Admin_general_info from "./Pages/Admin/Admin_courses";
 import FamilyManage from "./Pages/Admin/FamilyManage";
 import Confirmmbership from "./Pages/Admin/Confirmmbership";
@@ -100,6 +101,8 @@ const App = () => {
         <Route path="/admin/add_fellowership" element={<Add_fellowership />} />
         <Route path="/admin/redcrossfamilies" element={<AdminFamily />} />
         <Route path="/admin/families/:id" element={<FamilyManage />} />
+        <Route path="/admin/fellowship/:id" element={<AdminFellowshipDetail />} />
+        <Route path="/admin/activity/:id" element={<AdminActivityDetail />} />
         <Route path="/admin/announcement" element={<Admin_announcement />} />
         <Route path="/edit_announcement/:id" element={<Edit_announcement />} />
         <Route path="confirm_membership" element={<Confirmmbership />} />
@@ -139,13 +142,9 @@ const App = () => {
                 <Route path="/families/neutrality" element={<Neutrality />} />
                 <Route path="/event/fellowership" element={<All_fellowership />} />
                 <Route path="/event/allactivities" element={<All_Activities />} />
-                {/* Detail pages: the full description for one item. */}
-                <Route path="/fellowship/:id" element={<FellowshipDetail />} />
-                <Route path="/activity/:id" element={<ActivityDetail variant="redcross" />} />
-                <Route
-                  path="/family-activity/:id"
-                  element={<ActivityDetail variant="family" />}
-                />
+                {/* Family activities keep a public detail page; fellowships and
+                    Red Cross activities are read in the admin dashboard. */}
+                <Route path="/family-activity/:id" element={<FamilyActivityDetail />} />
                 <Route path="/families/universality" element={<Universality />} />
 
                 <Route path="/addactivities/:familyName" element={<Activitiesadd />} />

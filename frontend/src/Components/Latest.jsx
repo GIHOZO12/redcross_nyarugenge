@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { fellowshipService } from '../api';
 import { useFetch } from '../hooks';
 
@@ -55,14 +54,7 @@ const Latest = () => {
             </article>
             <div className="p-4">
               <h2 className="text-xl font-semibold text-gray-800">{item.title}</h2>
-              {/* clamped on the card; the full text lives on the detail page */}
-              <p className="text-gray-600 mt-2 line-clamp-3">{item.description}</p>
-              <Link
-                to={`/fellowship/${item.id}`}
-                className="inline-block mt-3 text-sm font-semibold text-red-600 hover:text-red-800"
-              >
-                View details &rarr;
-              </Link>
+              <p className="text-gray-600 mt-2">{item.description}</p>
             </div>
           </motion.div>
         ))}

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import { fellowshipService } from '../api';
 import { useFetch } from '../hooks';
@@ -79,14 +78,7 @@ const AllFellowship = () => {
               </article>
               <div>
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">{item.title}</h2>
-                {/* line-clamp keeps the card tidy; the full text is on the detail page */}
-                <p className="text-gray-600 text-sm line-clamp-3">{item.description}</p>
-                <Link
-                  to={`/fellowship/${item.id}`}
-                  className="inline-block mt-3 text-sm font-semibold text-red-600 hover:text-red-800"
-                >
-                  View details →
-                </Link>
+                <p className="text-gray-600 text-sm">{item.description}</p>
 
               </div>
             </div>

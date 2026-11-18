@@ -82,6 +82,14 @@ const Adminactivities = () => {
                 <p className="text-gray-700 text-sm">{item.description}</p>
 
                 <div className="p-3">
+                  {/* Full description */}
+                  <button
+                    className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors mr-2"
+                    onClick={() => navigate(`/admin/activity/${item.id}`)}
+                  >
+                    Details
+                  </button>
+
                   <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors mr-2"
                   onClick={()=>navigate(`/edit_activity/${item.id}`)}
                   >

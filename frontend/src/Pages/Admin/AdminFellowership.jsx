@@ -70,6 +70,14 @@ const AdminFellowership = () => {
                                 <p className="text-gray-700 text-sm">{item.description}</p>
                             </div>
                             <div className="flex justify-center items-center mt-4">
+                                {/* Full description and the "what we learned" images */}
+                                <button
+                                    className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors mr-2"
+                                    onClick={() => navigate(`/admin/fellowship/${item.id}`)}
+                                >
+                                    Details
+                                </button>
+
                                 {/* Edit Button */}
                                 <button
                                     className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors mr-2"
