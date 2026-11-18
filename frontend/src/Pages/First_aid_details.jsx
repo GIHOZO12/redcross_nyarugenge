@@ -1,5 +1,6 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useParams } from "react-router-dom"; // ✅ Get ID from URL
+import CourseVideo from "../Components/CourseVideo";
 import { coursesService } from "../api";
 import { useFetch } from "../hooks";
 
@@ -23,15 +24,9 @@ const FirstAidDetails = () => {
         <div className="flex flex-col lg:flex-row justify-between mb-8">
           {/* Course Video Section */}
           <section className="w-full lg:w-2/3 mb-6 lg:mb-0">
-            {courseDetails.first_video ? (
-              <video width="100%" height="auto" controls  className="rounded-lg shadow-md"  >
-               <source src={courseDetails.first_video} type="video/mp4" />
-
-
-              </video>
-            ) : (
-              <p className="text-center text-xl text-gray-500">No video available</p>
-            )}
+            {/* The course links out to where its video is hosted; CourseVideo
+                embeds YouTube and Drive, and offers a button for anything else. */}
+            <CourseVideo url={courseDetails.video_url} title={courseDetails.title} />
           </section>
 
           {/* Instructor Info Section */}

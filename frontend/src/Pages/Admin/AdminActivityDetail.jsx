@@ -4,12 +4,7 @@ import AdminLayout from "../../Layout/AdminLayout";
 import { activitiesService } from "../../api";
 import { useFetch } from "../../hooks";
 
-/**
- * Admin view of one Red Cross activity, with its description in full.
- *
- * The listing only ever shows a truncated card, and the public site does not
- * link to activities individually, so this is where the whole text is read.
- */
+
 const AdminActivityDetail = () => {
   const { id } = useParams();
 

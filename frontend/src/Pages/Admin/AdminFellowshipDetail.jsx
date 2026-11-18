@@ -5,15 +5,7 @@ import AdminLayout from "../../Layout/AdminLayout";
 import { fellowshipService, getErrorMessage } from "../../api";
 import { useFetch } from "../../hooks";
 
-/**
- * Admin view of one fellowship: the full description, and the captioned
- * images recording what it covered.
- *
- * This lives in the dashboard rather than on the public site because adding
- * images is an editing job, done alongside the other fellowship controls. The
- * server still decides who may write: a committee officer or staff. A reader
- * without that right sees the description and gallery but no controls.
- */
+
 const AdminFellowshipDetail = () => {
   const { id } = useParams();
 
