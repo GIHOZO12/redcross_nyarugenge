@@ -66,6 +66,7 @@ export const endpoints = {
     detail: (id) => `/family_admin/families/${id}/`,
     assignParent: (id) => `/family_admin/families/${id}/assign_parent/`,
     addChild: (id) => `/family_admin/families/${id}/children/`,
+    removeChild: (memberId) => `/family_admin/children/${memberId}/`,
     assignableUsers: "/family_admin/assignable_users/",
   },
 

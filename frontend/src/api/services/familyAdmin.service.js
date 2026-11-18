@@ -6,7 +6,7 @@
  * means "signed in, but not an officer" - worth telling those apart in the UI.
  */
 
-import { get, post } from "../client";
+import { get, post, remove } from "../client";
 import { endpoints } from "../endpoints";
 
 export const familyAdminService = {
@@ -47,6 +47,16 @@ export const familyAdminService = {
    */
   addChild: (familyId, payload) =>
     post(endpoints.familyAdmin.addChild(familyId), payload),
+
+  /**
+   * Take a child out of a family.
+   *
+   * Removes only the placement. Their account, committee office and any other
+   * placement they hold are untouched, so they can be added back later.
+   *
+   * @param {number} memberId - the child row's id, not the user's
+   */
+  removeChild: (memberId) => remove(endpoints.familyAdmin.removeChild(memberId)),
 };
 
 export default familyAdminService;

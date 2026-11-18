@@ -50,6 +50,26 @@ const FamilyManage = () => {
     }
   };
 
+  const removeChild = async (child) => {
+    const who =
+      child.user?.username ||
+      `${child.first_name} ${child.last_name}`.trim() ||
+      "this child";
+    const confirmed = await Swal.fire({
+      title: `Remove ${who}?`,
+      // Say plainly what is and is not deleted, so nobody avoids the button
+      // for fear of deleting someone's account.
+      text: "They are taken out of this family. Their account and role are not affected.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, remove",
+    });
+    if (!confirmed.isConfirmed) return;
+
+    run(() => familyAdminService.removeChild(child.id), "Removed");
+  };
+
   const assignParent = (slot, userId) =>
     run(
       () => familyAdminService.assignParent(id, slot, userId || null),
@@ -184,6 +204,7 @@ const FamilyManage = () => {
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Account</th>
+                  <th className="px-4 py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,6 +216,15 @@ const FamilyManage = () => {
                     <td className="px-4 py-2">{child.email}</td>
                     <td className="px-4 py-2 text-gray-600">
                       {child.user ? child.user.username : "No account"}
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={() => removeChild(child)}
+                        disabled={busy}
+                        className="text-red-600 hover:text-red-800 disabled:text-gray-400 font-semibold"
+                      >
+                        Remove
+                      </button>
                     </td>
                   </tr>
                 ))}
